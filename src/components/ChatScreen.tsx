@@ -17,6 +17,13 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+let messageSequence = 0;
+
+function createMessageId(): string {
+  messageSequence += 1;
+  return Date.now().toString(36) + "-" + messageSequence.toString(36);
+}
+
 type SentMessage = {
   id: string;
   text: string;
@@ -33,7 +40,7 @@ export default function ChatScreen() {
     const text = draft.trim();
     if (!text) return;
 
-    setSentMessages((current) => [...current, { id: Date.now().toString(), text }]);
+    setSentMessages((current) => [...current, { id: createMessageId(), text }]);
     setDraft("");
   };
 
