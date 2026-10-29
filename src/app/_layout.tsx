@@ -4,7 +4,6 @@ import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { ConvexReactClient } from "convex/react";
 import { Stack } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { ConvexProfileBootstrap } from "../components/ConvexProfileBootstrap";
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY ?? "";
 const convexUrl = process.env.EXPO_PUBLIC_CONVEX_URL ?? "";
@@ -23,9 +22,7 @@ export default function RootLayout() {
     <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
       <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
         <SafeAreaProvider>
-          <ConvexProfileBootstrap>
-            <Stack screenOptions={{ headerShown: false }} />
-          </ConvexProfileBootstrap>
+          <Stack screenOptions={{ headerShown: false }} />
         </SafeAreaProvider>
       </ConvexProviderWithClerk>
     </ClerkProvider>

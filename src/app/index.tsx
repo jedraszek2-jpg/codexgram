@@ -1,292 +1,86 @@
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-  useWindowDimensions,
-} from "react-native";
-
 import { useAuth } from "@clerk/expo";
 import { Image } from "expo-image";
 import { Link, Redirect } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useQuery } from "convex/react";
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { api } from "../../convex/_generated/api";
 
-const photo = require("../../assets/images/auth-scene.png");
 const logo = require("../../design/logo.png");
 
 export default function Index() {
-  const { width, height } = useWindowDimensions();
   const { isLoaded, isSignedIn } = useAuth({ treatPendingAsSignedOut: false });
+  const profile = useQuery(api.social.myProfile, isSignedIn ? {} : "skip");
 
-
-  const scale = Math.min(width / 390, 1.12);
-  const compact = height < 740;
-  const titleSize = (compact ? 27 : 30) * scale;
-  const bodySize = 18 * scale;
-  const buttonHeight = (compact ? 48 : 54) * scale;
-  const sceneTop = height * 0.246;
-  const sceneHeight = height * 0.472;
-  const headerTop = height * 0.123;
-  const footerBottom = height * 0.065;
-  const paginationTop = height * 0.653;
+  if (!isLoaded || (isSignedIn && profile === undefined)) {
+    return (
+      <SafeAreaView style={styles.loadingScreen}>
+        <ActivityIndicator color="#287BFF" />
+      </SafeAreaView>
+    );
+  }
 
   if (isSignedIn) {
-    return <Redirect href="/home" />;
+    return <Redirect href={profile ? "/home" : "/onboarding"} />;
   }
 
   return (
-    <View style={styles.screen}>
+    <SafeAreaView style={styles.screen}>
       <StatusBar style="dark" />
-
-      <View style={[styles.brand, { top: height * 0.075 }]}>
-        <Image source={logo} style={styles.brandIcon} contentFit="contain" accessible={false} />
-        <Text accessibilityRole="image" accessibilityLabel="Codexgram" style={styles.brandName}>
-          Codexgram
-        </Text>
+      <View style={styles.hero}>
+        <Image
+          source={require("../../assets/images/auth-scene.png")}
+          style={styles.heroImage}
+          contentFit="cover"
+          accessibilityLabel="A quiet sunset overlooking the sea"
+        />
+        <View pointerEvents="none" style={styles.heroShade} />
+        <View style={styles.brand}>
+          <Image source={logo} style={styles.logo} contentFit="contain" accessibilityLabel="Codexgram logo" />
+          <Text style={styles.brandName}>Codexgram</Text>
+          <Text style={styles.tagline}>Share the moments that bring you together.</Text>
+        </View>
       </View>
 
-      <Image
-        source={photo}
-        style={[styles.scene, { top: sceneTop, height: sceneHeight }]}
-        contentFit="fill"
-        accessible={false}
-      />
-
-      <View
-        style={[
-          styles.header,
-          {
-            top: headerTop,
-            paddingHorizontal: width * 0.08,
-          },
-        ]}
-      >
-        <Text
-          accessibilityRole="header"
-          style={[styles.title, { fontSize: titleSize, lineHeight: titleSize * 1.16 }]}
-        >
-          Share your world
-        </Text>
-        <Text
-          style={[
-            styles.subtitle,
-            {
-              fontSize: bodySize,
-              lineHeight: bodySize * 1.22,
-              marginTop: 18 * scale,
-            },
-          ]}
-        >
-          A minimal space for{"\n"}your moments
-        </Text>
+      <View style={styles.actions}>
+        <View style={styles.intro}>
+          <Text style={styles.heading}>Your moments, together.</Text>
+          <Text style={styles.description}>A place to share everyday life with the people you love.</Text>
+        </View>
+        <Link href="/sign-in" asChild>
+          <Pressable accessibilityRole="button" style={({ pressed }) => [styles.button, styles.primaryButton, pressed && styles.pressed]}>
+            <Text style={styles.primaryLabel}>Continue with Email</Text>
+          </Pressable>
+        </Link>
+        <Link href="/sign-in" asChild>
+          <Pressable accessibilityRole="button" style={({ pressed }) => [styles.button, styles.googleButton, pressed && styles.pressed]}>
+            <Text style={styles.googleLabel}>Continue with Google</Text>
+          </Pressable>
+        </Link>
       </View>
-
-      <View
-        pointerEvents="none"
-        accessibilityElementsHidden
-        importantForAccessibility="no-hide-descendants"
-        style={[styles.pagination, { top: paginationTop }]}
-      >
-        <View style={styles.activeDot} />
-        <View style={styles.inactiveDot} />
-        <View style={styles.inactiveDot} />
-      </View>
-
-      <View
-        style={[
-          styles.footer,
-          {
-            left: width * 0.125,
-            right: width * 0.125,
-            bottom: footerBottom,
-          },
-        ]}
-      >
-        {!isLoaded ? (
-          <View style={{ height: buttonHeight * 2 + 9 * scale }} />
-        ) : (
-          <>
-            <Link href="/sign-up" asChild>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Create account"
-                style={({ pressed }) => [
-                  styles.button,
-                  styles.primaryButton,
-                  { height: buttonHeight },
-                  pressed && styles.pressed,
-                ]}
-              >
-                <Text style={[styles.buttonLabel, { fontSize: 15 * scale }]}>
-                  Create account
-                </Text>
-              </Pressable>
-            </Link>
-
-            <Link href="/sign-in" asChild>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Sign in"
-                style={({ pressed }) => [
-                  styles.button,
-                  styles.secondaryButton,
-                  { height: buttonHeight, marginTop: 9 * scale },
-                  pressed && styles.pressed,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.buttonLabel,
-                    styles.darkButtonLabel,
-                    { fontSize: 15 * scale },
-                  ]}
-                >
-                  Sign in
-                </Text>
-              </Pressable>
-            </Link>
-
-            <Text
-              style={[
-                styles.legal,
-                {
-                  fontSize: 11 * scale,
-                  lineHeight: 16 * scale,
-                  marginTop: 15 * scale,
-                },
-              ]}
-            >
-              By continuing, you agree to our{"\n"}Terms of Service and Privacy Policy.
-            </Text>
-          </>
-        )}
-      </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: "#FBF3EE",
-    overflow: "hidden",
-  },
-  brand: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-  },
-  brandIcon: {
-    width: 26,
-    height: 26,
-    borderRadius: 6,
-  },
-  brandName: {
-    color: "#111114",
-    fontSize: 19,
-    fontWeight: "700",
-    letterSpacing: -0.45,
-  },
-  scene: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    width: "100%",
-  },
-  header: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    alignItems: "center",
-  },
-  title: {
-    color: "#101114",
-    fontWeight: "700",
-    letterSpacing: -0.8,
-    textAlign: "center",
-  },
-  subtitle: {
-    color: "#101114",
-    fontWeight: "400",
-    textAlign: "center",
-  },
-  pagination: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 7,
-  },
-  activeDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: "#FFFFFF",
-  },
-  inactiveDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 3,
-    backgroundColor: "#FFFFFF",
-    opacity: 0.56,
-  },
-  footer: {
-    position: "absolute",
-    alignItems: "stretch",
-  },
-  button: {
-    width: "100%",
-    borderRadius: 999,
-    alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
-  },
-  primaryButton: {
-    backgroundColor: "#FFFFFF",
-    shadowColor: "#1E1E1E",
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 5 },
-    elevation: 3,
-  },
-  secondaryButton: {
-    backgroundColor: "#111111",
-    shadowColor: "#1E1E1E",
-    shadowOpacity: 0.16,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 5 },
-    elevation: 3,
-  },
-  signOutButton: {
-    backgroundColor: "#111111",
-  },
-  pressed: {
-    opacity: 0.88,
-    transform: [{ scale: 0.99 }],
-  },
-  buttonLabel: {
-    color: "#101114",
-    fontWeight: "600",
-    textAlign: "center",
-  },
-  darkButtonLabel: {
-    color: "#FFFFFF",
-  },
-  accountLabel: {
-    color: "#181818",
-    fontWeight: "500",
-    textAlign: "center",
-    marginBottom: 5,
-  },
-  legal: {
-    color: "#181818",
-    fontWeight: "400",
-    textAlign: "center",
-  },
+  loadingScreen: { flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#FFFFFF" },
+  screen: { flex: 1, backgroundColor: "#FFFFFF" },
+  hero: { flex: 1.12, minHeight: 280, justifyContent: "center", overflow: "hidden" },
+  heroImage: { position: "absolute", top: 0, right: 0, bottom: 0, left: 0 },
+  heroShade: { position: "absolute", top: 0, right: 0, bottom: 0, left: 0, backgroundColor: "rgba(17, 28, 48, 0.32)" },
+  brand: { alignItems: "center", paddingHorizontal: 24 },
+  logo: { width: 76, height: 76, marginBottom: 12 },
+  brandName: { color: "#FFFFFF", fontSize: 36, fontWeight: "800", letterSpacing: 0.2 },
+  tagline: { color: "#F5F7FB", fontSize: 15, marginTop: 8, textAlign: "center" },
+  actions: { flex: 0.9, width: "100%", maxWidth: 440, alignSelf: "center", justifyContent: "center", gap: 12, paddingHorizontal: 28, paddingTop: 24, paddingBottom: 18 },
+  intro: { marginBottom: 8 },
+  heading: { color: "#17212F", fontSize: 23, fontWeight: "700", letterSpacing: -0.4 },
+  description: { color: "#687386", fontSize: 14, lineHeight: 20, marginTop: 6 },
+  button: { minHeight: 54, alignItems: "center", justifyContent: "center", borderRadius: 28 },
+  primaryButton: { backgroundColor: "#287BFF" },
+  googleButton: { borderWidth: 1, borderColor: "#D8DEE8", backgroundColor: "#FFFFFF" },
+  primaryLabel: { color: "#FFFFFF", fontSize: 16, fontWeight: "700" },
+  googleLabel: { color: "#20242C", fontSize: 16, fontWeight: "700" },
+  pressed: { opacity: 0.78 },
 });

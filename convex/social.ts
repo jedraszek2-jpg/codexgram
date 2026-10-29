@@ -112,6 +112,109 @@ export const myProfile = query({
   },
 });
 
+export const isUsernameAvailable = query({
+  args: { username: v.string() },
+  returns: v.boolean(),
+  handler: async (ctx, args) => {
+    const identity = await requireIdentity(ctx);
+    const username = args.username.trim().replace(/^@/, "");
+    if (username.length < 3 || username.length > 30 || !/^[a-zA-Z0-9._]+$/.test(username)) {
+      return false;
+    }
+    const normalizedUsername = username.toLowerCase();
+    const existing = await ctx.db
+      .query("profiles")
+      .withIndex("by_normalized_username", (q) => q.eq("normalizedUsername", normalizedUsername))
+      .unique();
+    return !existing || existing.tokenIdentifier === identity.tokenIdentifier;
+  },
+});
+
+export const generateProfileImageUploadUrl = mutation({
+  args: {},
+  returns: v.string(),
+  handler: async (ctx) => {
+    await requireIdentity(ctx);
+    return await ctx.storage.generateUploadUrl();
+  },
+});
+
+export const createProfile = mutation({
+  args: {
+    username: v.string(),
+    displayName: v.string(),
+    avatarStorageId: v.optional(v.id("_storage")),
+  },
+  returns: profileDoc,
+  handler: async (ctx, args) => {
+    const identity = await requireIdentity(ctx);
+    const existingProfile = await ctx.db
+      .query("profiles")
+      .withIndex("by_token_identifier", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
+      .unique();
+    if (existingProfile) {
+      if (existingProfile.accountStatus !== "active") throw new Error("This account is unavailable.");
+      return existingProfile;
+    }
+
+    const username = args.username.trim().replace(/^@/, "");
+    const normalizedUsername = username.toLowerCase();
+    const displayName = args.displayName.trim();
+    if (
+      username.length < 3 ||
+      username.length > 30 ||
+      !/^[a-zA-Z0-9._]+$/.test(username) ||
+      displayName.length < 1 ||
+      displayName.length > 50
+    ) {
+      throw new Error("Choose a valid username and display name.");
+    }
+
+    const usernameTaken = await ctx.db
+      .query("profiles")
+      .withIndex("by_normalized_username", (q) => q.eq("normalizedUsername", normalizedUsername))
+      .unique();
+    if (usernameTaken) throw new Error("That username is already in use.");
+
+    let avatarUrl: string | undefined;
+    if (args.avatarStorageId) {
+      const uploadedAvatarUrl = await ctx.storage.getUrl(args.avatarStorageId);
+      if (!uploadedAvatarUrl) throw new Error("The profile photo could not be loaded.");
+      avatarUrl = uploadedAvatarUrl;
+    }
+
+    const now = Date.now();
+    const profileId = await ctx.db.insert("profiles", {
+      tokenIdentifier: identity.tokenIdentifier,
+      username,
+      normalizedUsername,
+      displayName,
+      ...(avatarUrl ? { avatarUrl } : {}),
+      accountStatus: "active",
+      followerCount: 0,
+      followingCount: 0,
+      postCount: 0,
+      createdAt: now,
+      updatedAt: now,
+    });
+    const profile = await ctx.db.get(profileId);
+    if (!profile) throw new Error("Could not create your profile.");
+    return profile;
+  },
+});
+
+export const updateMyAvatar = mutation({
+  args: { storageId: v.id("_storage") },
+  returns: v.string(),
+  handler: async (ctx, args) => {
+    const profile = await requireProfile(ctx);
+    const avatarUrl = await ctx.storage.getUrl(args.storageId);
+    if (!avatarUrl) throw new Error("The profile photo could not be loaded.");
+    await ctx.db.patch(profile._id, { avatarUrl, updatedAt: Date.now() });
+    return avatarUrl;
+  },
+});
+
 export const ensureMyProfile = mutation({
   args: {
     username: v.string(),

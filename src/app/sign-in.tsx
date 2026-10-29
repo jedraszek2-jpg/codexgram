@@ -19,7 +19,7 @@ export default function SignInScreen() {
 
   useEffect(() => {
     if (isSignedIn) {
-      router.replace("/home");
+      router.replace("/");
     }
   }, [isSignedIn, router]);
 

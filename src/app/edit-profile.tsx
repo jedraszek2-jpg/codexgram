@@ -1,8 +1,11 @@
 import { router } from "expo-router";
 import { Image } from "expo-image";
+import * as ImagePicker from "expo-image-picker";
+import { File, UploadType } from "expo-file-system";
 import { StatusBar } from "expo-status-bar";
 import { SymbolView } from "expo-symbols";
 import { api } from "../../convex/_generated/api";
+import type { Id } from "../../convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 import {
@@ -29,10 +32,15 @@ export default function EditProfileScreen() {
   const scale = Math.min(width / 250, 1.5);
   const profile = useQuery(api.social.myProfile, {});
   const updateMyProfile = useMutation(api.social.updateMyProfile);
+  const generateProfileImageUploadUrl = useMutation(api.social.generateProfileImageUploadUrl);
+  const updateMyAvatar = useMutation(api.social.updateMyAvatar);
   const [draft, setDraft] = useState<ProfileDraft | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [location, setLocation] = useState("Poland");
+  const [avatarPreviewUri, setAvatarPreviewUri] = useState<string | null>(null);
+  const [avatarUrlOverride, setAvatarUrlOverride] = useState<string | null>(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
 
   const baseDraft: ProfileDraft = {
     displayName: profile?.displayName ?? "",
@@ -40,6 +48,7 @@ export default function EditProfileScreen() {
     bio: profile?.bio ?? "",
   };
   const values: ProfileDraft = { ...baseDraft, ...draft };
+  const avatarUri = avatarPreviewUri ?? avatarUrlOverride ?? profile?.avatarUrl ?? null;
 
   const updateField = (field: keyof ProfileDraft, value: string) => {
     setDraft((current) => ({ ...baseDraft, ...current, [field]: value }));
@@ -52,6 +61,64 @@ export default function EditProfileScreen() {
       { text: "France", onPress: () => setLocation("France") },
       { text: "Cancel", style: "cancel" },
     ]);
+  };
+
+  const chooseAvatar = async () => {
+    try {
+      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permission.granted) {
+        Alert.alert("Permission required", "Allow photo library access to choose a profile photo.");
+        return;
+      }
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.85,
+      });
+      if (result.canceled || !result.assets[0]) return;
+
+      const asset = result.assets[0];
+      setAvatarPreviewUri(asset.uri);
+      setAvatarUploading(true);
+      const file = new File(asset.uri);
+      if (file.size <= 0) throw new Error("The selected photo is empty.");
+      const path = asset.uri.split(/[?#]/, 1)[0].toLowerCase();
+      const extension = path.slice(path.lastIndexOf(".") + 1);
+      const fallbackMimeType =
+        extension === "png" ? "image/png" :
+        extension === "webp" ? "image/webp" :
+        extension === "heic" ? "image/heic" :
+        "image/jpeg";
+      const contentType = asset.mimeType ?? fallbackMimeType;
+      const uploadUrl = await generateProfileImageUploadUrl({});
+      const uploadTask = file.createUploadTask(uploadUrl, {
+        httpMethod: "POST",
+        uploadType: UploadType.BINARY_CONTENT,
+        headers: { "Content-Type": contentType },
+      });
+      const uploadResponse = await uploadTask.uploadAsync().finally(() => uploadTask.release());
+      if (!uploadResponse || uploadResponse.status < 200 || uploadResponse.status >= 300) {
+        const status = uploadResponse?.status ?? "no response";
+        const responseText = uploadResponse?.body.trim().slice(0, 180);
+        throw new Error(
+          responseText
+            ? `Convex rejected the photo upload (${status}): ${responseText}`
+            : `Convex rejected the photo upload (${status}).`,
+        );
+      }
+      const uploadResult = JSON.parse(uploadResponse.body) as { storageId?: string };
+      if (!uploadResult.storageId) throw new Error("The photo upload response was invalid.");
+
+      const avatarUrl = await updateMyAvatar({ storageId: uploadResult.storageId as Id<"_storage"> });
+      setAvatarUrlOverride(avatarUrl);
+      setAvatarPreviewUri(null);
+    } catch (cause) {
+      setAvatarPreviewUri(null);
+      Alert.alert("Profile photo failed", cause instanceof Error ? cause.message : "Please try again.");
+    } finally {
+      setAvatarUploading(false);
+    }
   };
 
   const saveProfile = async () => {
@@ -121,20 +188,26 @@ export default function EditProfileScreen() {
           <Image
             accessibilityLabel="Profile photo"
             contentFit="cover"
-            source={require("../../assets/images/profile-avatar.png")}
+            source={avatarUri ? { uri: avatarUri } : require("../../assets/images/profile-avatar.png")}
             style={styles.avatar}
           />
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Change profile photo"
-            onPress={() => Alert.alert("Profile photo", "Photo selection is not connected yet.")}
+            accessibilityState={{ disabled: avatarUploading }}
+            disabled={avatarUploading}
+            onPress={() => void chooseAvatar()}
             style={[styles.cameraButton, { width: 24 * scale, height: 24 * scale, borderRadius: 12 * scale, borderWidth: 2 * scale }]}
           >
-            <SymbolView
-              name={{ ios: "camera.fill", android: "photo_camera", web: "photo_camera" }}
-              tintColor="#FFFFFF"
-              style={{ width: 12 * scale, height: 12 * scale }}
-            />
+            {avatarUploading ? (
+              <ActivityIndicator size="small" color="#FFFFFF" />
+            ) : (
+              <SymbolView
+                name={{ ios: "camera.fill", android: "photo_camera", web: "photo_camera" }}
+                tintColor="#FFFFFF"
+                style={{ width: 12 * scale, height: 12 * scale }}
+              />
+            )}
           </Pressable>
         </View>
 
