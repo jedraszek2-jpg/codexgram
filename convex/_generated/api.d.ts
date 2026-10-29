@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as activities from "../activities.js";
 import type * as demoSeed from "../demoSeed.js";
 import type * as lib_auth from "../lib/auth.js";
 import type * as media from "../media.js";
@@ -22,6 +23,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  activities: typeof activities;
   demoSeed: typeof demoSeed;
   "lib/auth": typeof lib_auth;
   media: typeof media;

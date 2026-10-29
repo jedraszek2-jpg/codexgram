@@ -101,7 +101,7 @@ export default function HomeScreen() {
             accessibilityRole="button"
             accessibilityLabel="Notifications"
             hitSlop={8}
-            onPress={() => Alert.alert("Notifications", "You're all caught up.")}
+            onPress={() => router.push("/activity")}
             style={({ pressed }) => [styles.headerIconButton, pressed && styles.pressed]}
           >
             <SymbolView name={{ ios: "bell", android: "notifications", web: "notifications" }} tintColor="#1F1F1F" size={23} />

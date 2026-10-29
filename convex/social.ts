@@ -433,6 +433,13 @@ export const toggleFollow = mutation({
     await ctx.db.patch(viewer._id, { followingCount: viewer.followingCount + 1 });
     const followerCount = target.followerCount + 1;
     await ctx.db.patch(target._id, { followerCount });
+    await ctx.db.insert("activities", {
+      recipientId: target._id,
+      actorId: viewer._id,
+      type: "follow",
+      createdAt: Date.now(),
+      isRead: false,
+    });
     return { following: true, followerCount };
   },
 });
@@ -493,6 +500,16 @@ export const toggleLike = mutation({
     });
     const likeCount = post.likeCount + 1;
     await ctx.db.patch(post._id, { likeCount });
+    if (post.authorId !== profile._id) {
+      await ctx.db.insert("activities", {
+        recipientId: post.authorId,
+        actorId: profile._id,
+        type: "like",
+        postId: post._id,
+        createdAt: Date.now(),
+        isRead: false,
+      });
+    }
     return { liked: true, likeCount };
   },
 });
@@ -676,6 +693,14 @@ export const addComment = mutation({
       createdAt: Date.now(),
     });
     await ctx.db.patch(post._id, { commentCount: post.commentCount + 1 });
+    await ctx.db.insert("activities", {
+      recipientId: post.authorId,
+      actorId: author._id,
+      type: "comment",
+      postId: post._id,
+      createdAt: Date.now(),
+      isRead: false,
+    });
     return commentId;
   },
 });

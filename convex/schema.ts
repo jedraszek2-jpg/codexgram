@@ -71,6 +71,15 @@ export default defineSchema({
     .index("by_post_and_created_at", ["postId", "createdAt"])
     .index("by_author", ["authorId"]),
 
+  activities: defineTable({
+    recipientId: v.id("profiles"),
+    actorId: v.id("profiles"),
+    type: v.union(v.literal("like"), v.literal("comment"), v.literal("follow")),
+    postId: v.optional(v.id("posts")),
+    createdAt: v.number(),
+    isRead: v.boolean(),
+  }).index("by_recipient_and_created_at", ["recipientId", "createdAt"]),
+
   conversations: defineTable({
     member1Id: v.id("profiles"),
     member2Id: v.id("profiles"),
