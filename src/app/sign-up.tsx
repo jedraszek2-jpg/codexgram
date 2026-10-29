@@ -6,7 +6,7 @@ import { useEffect } from "react";
 
 const logo = (
   <Image
-    source={require("../../assets/images/codexgram-mark.png")}
+    source={require("../../design/logo.png")}
     style={{ width: 36, height: 36 }}
     contentFit="contain"
     accessibilityLabel="Codexgram"

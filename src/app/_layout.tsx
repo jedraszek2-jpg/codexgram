@@ -1,20 +1,33 @@
-import { ClerkProvider } from "@clerk/expo";
+import { ClerkProvider, useAuth } from "@clerk/expo";
 import { tokenCache } from "@clerk/expo/token-cache";
+import { ConvexProviderWithClerk } from "convex/react-clerk";
+import { ConvexReactClient } from "convex/react";
 import { Stack } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { ConvexProfileBootstrap } from "../components/ConvexProfileBootstrap";
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY ?? "";
+const convexUrl = process.env.EXPO_PUBLIC_CONVEX_URL ?? "";
 
 if (!publishableKey) {
-  throw new Error("Missing EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY. Add your key to .env.local.\nRun: 1) clerk auth login  2) clerk link  3) clerk env pull â€” then restart the dev server.");
+  throw new Error("Missing EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY. Add your Clerk publishable key to .env.local.");
 }
+if (!convexUrl) {
+  throw new Error("Missing EXPO_PUBLIC_CONVEX_URL. Add your Convex deployment URL to .env.local.");
+}
+
+const convex = new ConvexReactClient(convexUrl);
 
 export default function RootLayout() {
   return (
     <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
-      <SafeAreaProvider>
-        <Stack screenOptions={{ headerShown: false }} />
-      </SafeAreaProvider>
+      <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
+        <SafeAreaProvider>
+          <ConvexProfileBootstrap>
+            <Stack screenOptions={{ headerShown: false }} />
+          </ConvexProfileBootstrap>
+        </SafeAreaProvider>
+      </ConvexProviderWithClerk>
     </ClerkProvider>
   );
 }

@@ -1,4 +1,4 @@
-﻿# Codexgram — Product and Implementation Plan
+# Codexgram — Product and Implementation Plan
 
 ## 1. Purpose
 
@@ -86,18 +86,18 @@ The core product promise is: users can publish a moment, see recent posts from p
 - Block removes the mutual follow edge and blocks profile/post viewing, following, and messaging in both directions.
 - Report captures the reporter, target, reason, and time, and enters an owner/admin review queue.
 - Admin can hide reported content or suspend an account. Reported content is not automatically removed solely because it was reported.
-- Account deletion requires an explicit confirmation. Delete user-owned Convex records and R2 objects, revoke/remove device tokens, and clear the Clerk account. Define and implement retryable deletion jobs so partial failures can be reconciled. Other participants’ conversation records remain, but messages authored by the deleted user are purged.
+- Account deletion requires an explicit confirmation. Delete user-owned Convex records and Convex File Storage objects, revoke/remove device tokens, and clear the Clerk account. Define and implement retryable deletion jobs so partial failures can be reconciled. Other participants’ conversation records remain, but messages authored by the deleted user are purged.
 
 ## 5. Data model and source of truth
 
-Clerk is the source of truth for authentication identity and sessions. Convex is the source of truth for application profiles, relationships, posts, interactions, messages, moderation, and notification preferences. R2 stores media bytes; Convex stores media metadata and object keys, never long-lived secrets.
+Clerk is the source of truth for authentication identity and sessions. Convex is the source of truth for application profiles, relationships, posts, interactions, messages, moderation, and notification preferences. Convex File Storage stores media bytes; Convex tables store media IDs and metadata, never file bytes.
 
 Proposed Convex tables (use Convex IDs and indexes, not client-chosen IDs):
 
 - **profiles**: clerkUserId (unique), normalized username (unique), display name, bio, avatar media ID, date of birth, account status, created/updated timestamps. Index by Clerk ID and username.
 - **follows**: follower profile ID, followed profile ID, created timestamp. Enforce one directed edge per pair; index by follower and by followed profile.
 - **posts**: author profile ID, media ID, media type, caption, created timestamp, visibility/status. Index by author and by creation time for feed/explore queries.
-- **media**: owner profile ID, R2 object key, media type, MIME type, byte size, optional duration, access class, upload/finalization state, created timestamp. Index by owner and upload state.
+- **media**: owner profile ID, Convex storage ID, media type, MIME type, byte size, optional duration, upload/finalization state, created timestamp. Index by owner and upload state.
 - **likes**: post ID, user profile ID, created timestamp. Unique pair; indexes by post and user.
 - **comments**: post ID, author profile ID, text, created timestamp, status. Index by post/time and author.
 - **conversations**: normalized two-member pair, created/last-message timestamps. Enforce one conversation per unordered pair; index by both members and last-message time.
@@ -114,11 +114,11 @@ Validate all client input on the server. Use server-side authorization on every 
 - **Client:** Expo + React Native, Expo Router routes under src/app/, NativeWind for styling. Use Expo Router native tabs for the four primary tabs. Keep reusable UI, hooks, and utilities outside the route tree.
 - **Auth:** Clerk Expo SDK for Google/Apple auth and session lifecycle; Clerk identity integrated with Convex auth. Native authentication and push support require development builds, not Expo Go alone.
 - **Backend:** Convex queries/mutations/actions for app data and real-time subscriptions. Keep authorization and business rules in Convex functions, not screens.
-- **Media:** Cloudflare R2 for all uploaded media. Client requests a narrowly scoped upload URL through an authenticated Convex action; server validates user, type, size, and limits before signing. Client uploads directly to R2, then calls a finalization mutation. Public post/avatar objects may be served through the chosen public/CDN path. DM attachments remain private and are delivered using short-lived signed read URLs after membership/block authorization. Presigned URLs are bearer credentials until expiry; never log them or persist them as public profile data.
+- **Media:** Convex File Storage for uploaded media. An authenticated mutation issues an upload URL; the client uploads directly to Convex, then calls a finalization mutation. Public post/avatar URLs are bearer URLs and may be shared. Private DM media delivery requires a separate authorization design before implementation.
 - **Media handling:** Expo Image Picker for library selection and Expo Video for playback. No camera, cropping, filters, or transcoding in v1. Original media compatibility and playback should be validated on both platforms.
 - **Push:** Expo Notifications and Expo Push Service for messages, likes, comments, and follows. Ask for OS permission contextually after a relevant action (follow or starting a conversation), not immediately at launch. Tapping a notification deep-links to the exact conversation, post, or profile.
 - **Monitoring:** capture crashes/errors and backend failures. No behavioral analytics in v1. Monitoring vendor remains to be selected.
-- **Secrets:** Clerk keys, Convex deployment configuration, R2 credentials, and push credentials belong in environment/deployment secret storage, never in client code or source control.
+- **Secrets:** Clerk keys, Convex deployment configuration, and push credentials belong in environment/deployment secret storage, never in client code or source control.
 
 ### Media constraints
 
@@ -126,7 +126,7 @@ Validate all client input on the server. Use server-side authorization on every 
 - Photos: maximum 15 MB.
 - Videos: maximum 30 seconds and 50 MB; tap-to-play, muted by default.
 - DM attachments: image/video supported; set matching limits during implementation before enabling uploads.
-- On upload failure, keep the draft locally where feasible and offer retry. Reconcile abandoned uploads and orphaned R2 objects with a scheduled cleanup process. Never publish a post whose media was not finalized.
+- On upload failure, keep the draft locally where feasible and offer retry. Reconcile abandoned uploads and orphaned Convex storage files with a scheduled cleanup process. Never publish a post whose media was not finalized.
 
 ## 7. State, async work, and failure behavior
 
@@ -158,8 +158,8 @@ Validate all client input on the server. Use server-side authorization on every 
 ### Phase 0 — Confirm setup and service decisions
 
 - Verify package baseline and matching SDK 57 docs before adding or changing Expo APIs.
-- Create Clerk, Convex, Cloudflare R2, and Expo/EAS project credentials for separate development and beta environments.
-- Decide R2 public-media delivery domain, private bucket/access policy, signed URL TTL, monitoring vendor, locale scope, and DM upload limits.
+- Create Clerk, Convex, and Expo/EAS project credentials for separate development and beta environments.
+- Decide monitoring vendor, locale scope, and DM upload limits.
 - Record the privacy and age-gate treatment before collecting real beta user data.
 
 **Exit:** service accounts and environment boundaries are documented; no secrets are committed.
@@ -189,9 +189,9 @@ Validate all client input on the server. Use server-side authorization on every 
 
 **Exit:** data invariants and permissions are enforced on the backend, including attempts made outside the UI.
 
-### Phase 4 — R2 media pipeline and posts
+### Phase 4 — Convex file storage and posts
 
-- Implement authenticated R2 upload URL issuance, direct upload, finalization, signed private reads, and orphan cleanup.
+- Implement authenticated Convex upload URL issuance, direct upload, finalization, and orphan cleanup.
 - Add library selection, type/size/duration validation, preview, caption, upload progress, retry, and publish.
 - Implement post deletion with media cleanup; build profile post grid and post detail.
 - Add image/video rendering and playback behavior within Expo 57 APIs.
@@ -225,7 +225,7 @@ Validate all client input on the server. Use server-side authorization on every 
 
 ### Phase 8 — Hardening, beta, and release
 
-- Implement retryable account deletion across Clerk, Convex, R2, and push tokens; test partial-failure recovery.
+- Implement retryable account deletion across Clerk, Convex File Storage, and push tokens; test partial-failure recovery.
 - Add error/crash monitoring, rate limits, abuse controls, privacy notice, and budget alerts.
 - Complete automated tests for core Convex rules and flows plus manual iOS/Android smoke checks.
 - Run npx expo lint and npx tsc --noEmit; run Expo Doctor and resolve applicable SDK/config issues.
@@ -251,7 +251,7 @@ Validate all client input on the server. Use server-side authorization on every 
 - Public accounts/posts and immediate follows are the only visibility mode in v1.
 - A post contains exactly one media asset; comments are text-only and cannot be edited.
 - Any signed-in user may interact with public content unless blocked or suspended.
-- R2 stores all media; post/avatar media may be publicly deliverable, while DM media uses temporary signed reads.
+- Convex File Storage holds uploaded media; post/avatar media may be publicly deliverable. Define an authorization-aware delivery path before storing private DM attachments.
 - No media transformations/transcoding are included in v1.
 - Beta is invite-only by distribution, but the app has no in-product invite code.
 - Development and beta/production are separate environments; staging is not yet defined.
@@ -261,17 +261,17 @@ Validate all client input on the server. Use server-side authorization on every 
 1. Which additional locales, if any, are required for the beta? Current working assumption: English UI, structured so localization can be added.
 2. What signed URL lifetime should private DM media use? Choose the shortest TTL that supports normal playback and retries.
 3. Which crash/error monitoring provider should be used? No vendor selected.
-4. What is the exact environment topology and who owns Clerk, Convex, R2, and EAS credentials?
+4. What is the exact environment topology and who owns Clerk, Convex, and EAS credentials?
 5. What DM attachment size/duration limits should match post limits?
 6. What are the date-of-birth retention and privacy-notice requirements for the target jurisdictions?
-7. Which public media delivery domain/cache policy and R2 cleanup schedule will be used?
+7. Which Convex storage cleanup schedule will be used?
 8. Which rate limits and beta spending alerts should be configured? Exact dollar limits have not been set.
 
 ### Risks
 
 - Expo Router native tabs are marked unstable in the SDK 57 documentation; validate behavior early on both platforms and retain a navigation fallback decision.
 - Native Clerk auth and remote push require development builds and correct provider/EAS configuration; Expo Go is insufficient for full validation.
-- R2 signed URLs are bearer links while valid. A leaked URL can be used until expiry; authorization must happen before issuing one and TTLs/logging must be controlled.
+- Convex File Storage URLs are bearer links that remain accessible until the file is deleted; authorize access before returning a URL.
 - Without transcoding, device-generated video codecs, dimensions, and network conditions may cause playback problems. Validate real devices and sample media before beta.
 - Account deletion spans several services and can partially fail. Make cleanup idempotent, retryable, and visible to operators.
 - Self-declared age gating does not verify age; the privacy/legal approach and target jurisdictions need review before beta.
@@ -293,5 +293,5 @@ References to verify at implementation time:
 - [NativeWind installation](https://www.nativewind.dev/docs/getting-started/installation)
 - [Clerk Google sign-in for Expo](https://clerk.com/docs/expo/guides/configure/auth-strategies/sign-in-with-google)
 - [Convex authentication with Clerk](https://docs.convex.dev/auth/clerk)
-- [Cloudflare R2 presigned URLs](https://developers.cloudflare.com/r2/api/s3/presigned-urls/)
+
 - [Apple App Review Guidelines](https://developer.apple.com/app-store/review/guidelines/)

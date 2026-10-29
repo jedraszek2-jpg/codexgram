@@ -295,7 +295,7 @@ export default function ChatScreen() {
                 accessibilityLabel="Message"
                 onChangeText={setDraft}
                 onSubmitEditing={sendMessage}
-                placeholder="Message..."
+                placeholder="Type a message..."
                 placeholderTextColor="#858B96"
                 returnKeyType="send"
                 style={[styles.messageInput, { fontSize: 10 * scale }]}

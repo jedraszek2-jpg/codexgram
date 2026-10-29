@@ -12,7 +12,7 @@ import { Link, Redirect } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
 const photo = require("../../assets/images/auth-scene.png");
-const logo = require("../../assets/images/codexgram-mark.png");
+const logo = require("../../design/logo.png");
 
 export default function Index() {
   const { width, height } = useWindowDimensions();
