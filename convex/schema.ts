@@ -70,4 +70,24 @@ export default defineSchema({
   })
     .index("by_post_and_created_at", ["postId", "createdAt"])
     .index("by_author", ["authorId"]),
+
+  conversations: defineTable({
+    member1Id: v.id("profiles"),
+    member2Id: v.id("profiles"),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    lastMessageAt: v.number(),
+  })
+    .index("by_member1_and_member2", ["member1Id", "member2Id"])
+    .index("by_member1_and_last_message_at", ["member1Id", "lastMessageAt"])
+    .index("by_member2_and_last_message_at", ["member2Id", "lastMessageAt"]),
+
+  messages: defineTable({
+    conversationId: v.id("conversations"),
+    senderId: v.id("profiles"),
+    body: v.string(),
+    createdAt: v.number(),
+  })
+    .index("by_conversation_and_created_at", ["conversationId", "createdAt"])
+    .index("by_sender", ["senderId"]),
 });

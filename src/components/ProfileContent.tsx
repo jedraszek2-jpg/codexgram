@@ -1,8 +1,10 @@
 import { router } from "expo-router";
 import { Image } from "expo-image";
 import { SymbolView } from "expo-symbols";
+import { useMutation } from "convex/react";
 import { useState, type ComponentProps } from "react";
-import { Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { Alert, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
 
 type ProfileSection = "grid" | "videos" | "tagged";
@@ -47,6 +49,8 @@ export function ProfileContent({
 }) {
   const { width } = useWindowDimensions();
   const [selectedSection, setSelectedSection] = useState<ProfileSection>("grid");
+  const [messagePending, setMessagePending] = useState(false);
+  const getOrCreateConversation = useMutation(api.messages.getOrCreateConversation);
   const scale = Math.min(width / 250, 1.45);
   const avatarSize = 56 * scale;
   const imageGap = 2;
@@ -105,23 +109,53 @@ export function ProfileContent({
             <Text style={[styles.profileButtonLabel, { fontSize: 9 * scale }]}>Edit Profile</Text>
           </Pressable>
         ) : (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={(profile.isFollowing ? "Unfollow " : "Follow ") + profile.displayName}
-            accessibilityState={{ selected: profile.isFollowing, disabled: followPending }}
-            disabled={followPending}
-            onPress={onFollow}
-            style={[
-              styles.profileButton,
-              profile.isFollowing && styles.followingButton,
-              followPending && styles.followPending,
-              { height: 20 * scale, borderRadius: 12 * scale, marginTop: 8 * scale },
-            ]}
-          >
-            <Text style={[styles.profileButtonLabel, profile.isFollowing && styles.followingLabel, { fontSize: 9 * scale }]}>
-              {followPending ? "…" : profile.isFollowing ? "Following" : "Follow"}
-            </Text>
-          </Pressable>
+          <View style={[styles.profileActions, { marginTop: 8 * scale, gap: 6 * scale }]}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={(profile.isFollowing ? "Unfollow " : "Follow ") + profile.displayName}
+              accessibilityState={{ selected: profile.isFollowing, disabled: followPending }}
+              disabled={followPending}
+              onPress={onFollow}
+              style={[
+                styles.profileButton,
+                profile.isFollowing && styles.followingButton,
+                followPending && styles.followPending,
+                { height: 22 * scale, borderRadius: 12 * scale, paddingHorizontal: 12 * scale },
+              ]}
+            >
+              <Text style={[styles.profileButtonLabel, profile.isFollowing && styles.followingLabel, { fontSize: 9 * scale }]}>
+                {followPending ? "…" : profile.isFollowing ? "Following" : "Follow"}
+              </Text>
+            </Pressable>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={profile.isFollowing ? `Message ${profile.displayName}` : `Follow ${profile.displayName} to message`}
+              accessibilityState={{ disabled: !profile.isFollowing || messagePending }}
+              disabled={!profile.isFollowing || messagePending}
+              onPress={() => {
+                if (!profile.isFollowing || messagePending) return;
+                setMessagePending(true);
+                void getOrCreateConversation({ otherUserId: profile._id })
+                  .then((conversationId) => {
+                    router.push({ pathname: "/chat", params: { conversationId } });
+                  })
+                  .catch((cause: unknown) => {
+                    Alert.alert("Couldn't start conversation", cause instanceof Error ? cause.message : "Please try again.");
+                  })
+                  .finally(() => setMessagePending(false));
+              }}
+              style={[
+                styles.profileButton,
+                styles.messageButton,
+                (!profile.isFollowing || messagePending) && styles.followPending,
+                { height: 22 * scale, borderRadius: 12 * scale, paddingHorizontal: 12 * scale },
+              ]}
+            >
+              <Text style={[styles.messageButtonLabel, { fontSize: 9 * scale }]}>
+                {messagePending ? "Opening…" : profile.isFollowing ? "Message" : "Follow first"}
+              </Text>
+            </Pressable>
+          </View>
         )}
       </View>
 
@@ -198,10 +232,13 @@ const styles = StyleSheet.create({
   bio: { paddingTop: 1, paddingBottom: 2 },
   displayName: { color: "#111114", fontWeight: "700", lineHeight: 15 },
   bioText: { color: "#1F1F1F", fontWeight: "400" },
+  profileActions: { flexDirection: "row", alignItems: "center" },
   profileButton: { alignItems: "center", justifyContent: "center", backgroundColor: "#E9EBEF" },
   profileButtonLabel: { color: "#111114", fontWeight: "600" },
   followingButton: { backgroundColor: "#E9EDF3" },
   followingLabel: { color: "#303640" },
+  messageButton: { backgroundColor: "#287BFF" },
+  messageButtonLabel: { color: "#FFFFFF", fontWeight: "600" },
   followPending: { opacity: 0.6 },
   sectionBar: { flexDirection: "row", alignItems: "stretch", marginTop: 4 },
   sectionButton: { flex: 1, alignItems: "center", justifyContent: "center" },

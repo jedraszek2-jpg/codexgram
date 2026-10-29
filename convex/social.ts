@@ -31,6 +31,13 @@ const profileSummary = v.object({
   isFollowing: v.boolean(),
 });
 
+const followingSummary = v.object({
+  _id: v.id("profiles"),
+  username: v.string(),
+  displayName: v.string(),
+  avatarUrl: v.union(v.string(), v.null()),
+});
+
 const feedPost = v.object({
   _id: v.id("posts"),
   _creationTime: v.number(),
@@ -368,6 +375,29 @@ export const searchProfiles = query({
         };
       }),
     );
+  },
+});
+
+export const myFollowing = query({
+  args: {},
+  returns: v.array(followingSummary),
+  handler: async (ctx) => {
+    const viewer = await requireProfile(ctx);
+    const follows = await ctx.db
+      .query("follows")
+      .withIndex("by_follower", (q) => q.eq("followerId", viewer._id))
+      .order("desc")
+      .take(100);
+    const profiles = await Promise.all(follows.map((follow) => ctx.db.get(follow.followingId)));
+    return profiles
+      .filter((profile): profile is NonNullable<typeof profile> => profile !== null)
+      .filter((profile) => profile.accountStatus === "active")
+      .map((profile) => ({
+        _id: profile._id,
+        username: profile.username,
+        displayName: profile.displayName,
+        avatarUrl: profile.avatarUrl ?? null,
+      }));
   },
 });
 

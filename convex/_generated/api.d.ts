@@ -11,6 +11,7 @@
 import type * as demoSeed from "../demoSeed.js";
 import type * as lib_auth from "../lib/auth.js";
 import type * as media from "../media.js";
+import type * as messages from "../messages.js";
 import type * as social from "../social.js";
 
 import type {
@@ -23,6 +24,7 @@ declare const fullApi: ApiFromModules<{
   demoSeed: typeof demoSeed;
   "lib/auth": typeof lib_auth;
   media: typeof media;
+  messages: typeof messages;
   social: typeof social;
 }>;
 
