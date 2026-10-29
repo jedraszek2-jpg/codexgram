@@ -7,7 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -20,6 +20,8 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { CommentsSheet } from "./CommentsSheet";
+import { StoryViewer } from "./StoryViewer";
+import type { StoryGroup } from "./StoryViewer";
 
 type FeedPost = {
   _id: Id<"posts">;
@@ -39,43 +41,22 @@ type FeedPost = {
   isLiked: boolean;
 };
 
-type Story = {
-  label: string;
-  image: number;
-  ring: string;
-  isOwn?: boolean;
-};
-
-const stories: Story[] = [
-  {
-    label: "Your story",
-    image: require("../../assets/images/home-story-you.png"),
-    ring: "#D9DDE4",
-    isOwn: true,
-  },
-  {
-    label: "Anna Kowalska",
-    image: require("../../assets/images/home-story-anna.png"),
-    ring: "#EE4B88",
-  },
-  {
-    label: "Tomasz Nowak",
-    image: require("../../assets/images/home-story-tomasz.png"),
-    ring: "#9B55D8",
-  },
-  {
-    label: "Kasia Zielinska",
-    image: require("../../assets/images/home-story-kasia.png"),
-    ring: "#F2784B",
-  },
-];
-
 export default function HomeScreen() {
   const { width } = useWindowDimensions();
   const feed = useQuery(api.social.homeFeed, {});
+  const [storiesNow, setStoriesNow] = useState(() => Date.now());
+  const activeStories = useQuery(api.stories.getActiveStories, { now: storiesNow });
   const toggleLike = useMutation(api.social.toggleLike);
   const [selectedPostId, setSelectedPostId] = useState<Id<"posts"> | null>(null);
+  const [selectedStoryGroupIndex, setSelectedStoryGroupIndex] = useState<number | null>(null);
   const [pendingLikes, setPendingLikes] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const timer = setInterval(() => setStoriesNow(Date.now()), 60_000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const closeStoryViewer = useCallback(() => setSelectedStoryGroupIndex(null), []);
 
   const handleLike = async (postId: Id<"posts">) => {
     if (pendingLikes.has(postId)) return;
@@ -140,7 +121,13 @@ export default function HomeScreen() {
             onComments={() => setSelectedPostId(item._id)}
           />
         )}
-        ListHeaderComponent={<StoriesRail />}
+        ListHeaderComponent={
+          <StoriesRail
+            stories={activeStories}
+            onCreate={() => router.push("/new-story")}
+            onOpen={(index) => setSelectedStoryGroupIndex(index)}
+          />
+        }
         ListEmptyComponent={
           feed === undefined ? (
             <ActivityIndicator color="#3A86FF" style={styles.loading} />
@@ -167,14 +154,45 @@ export default function HomeScreen() {
         visible={selectedPostId !== null}
         onClose={() => setSelectedPostId(null)}
       />
+      {selectedStoryGroupIndex !== null && activeStories?.[selectedStoryGroupIndex] ? (
+        <StoryViewer
+          groups={activeStories as StoryGroup[]}
+          initialGroupIndex={selectedStoryGroupIndex}
+          onClose={closeStoryViewer}
+        />
+      ) : null}
     </SafeAreaView>
   );
 }
 
-function StoriesRail() {
+function StoriesRail({
+  stories,
+  onCreate,
+  onOpen,
+}: {
+  stories: StoryGroup[] | undefined;
+  onCreate: () => void;
+  onOpen: (index: number) => void;
+}) {
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.stories}>
-      {stories.map((story) => <StoryItem key={story.label} story={story} />)}
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Add to your story"
+        onPress={onCreate}
+        style={({ pressed }) => [styles.storyItem, pressed && styles.pressed]}
+      >
+        <View style={[styles.storyRing, styles.ownStoryRing]}>
+          <Image source={require("../../assets/images/home-story-you.png")} style={styles.storyImage} contentFit="cover" />
+          <View style={styles.storyAdd}>
+            <SymbolView name={{ ios: "plus", android: "add", web: "add" }} tintColor="#FFFFFF" size={12} />
+          </View>
+        </View>
+        <Text style={styles.storyLabel} numberOfLines={1}>Your story</Text>
+      </Pressable>
+      {stories?.map((story, index) => (
+        <StoryItem key={story.author._id} story={story} onPress={() => onOpen(index)} />
+      ))}
     </ScrollView>
   );
 }
@@ -344,25 +362,26 @@ function VideoPostMedia({ uri, width, height }: { uri: string; width: number; he
   );
 }
 
-function StoryItem({ story }: { story: Story }) {
-  const title = story.isOwn ? "Your story" : story.label + "'s story";
-  const label = story.isOwn ? "Add to your story" : "View " + title;
+function StoryItem({ story, onPress }: { story: StoryGroup; onPress: () => void }) {
+  const title = story.author.displayName + "'s story";
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={label}
-      onPress={() => Alert.alert(title, story.isOwn ? "Story creation is coming soon." : "Story viewer is coming soon.")}
+      accessibilityLabel={"View " + title}
+      onPress={onPress}
       style={({ pressed }) => [styles.storyItem, pressed && styles.pressed]}
     >
-      <View style={[styles.storyRing, { borderColor: story.ring }]}>
-        <Image source={story.image} style={styles.storyImage} contentFit="cover" />
-        {story.isOwn ? (
-          <View style={styles.storyAdd}>
-            <SymbolView name={{ ios: "plus", android: "add", web: "add" }} tintColor="#FFFFFF" size={12} />
+      <View style={[styles.storyRing, styles.activeStoryRing]}>
+        {story.author.avatarUrl ? (
+          <Image source={{ uri: story.author.avatarUrl }} style={styles.storyImage} contentFit="cover" />
+        ) : null}
+        {!story.author.avatarUrl ? (
+          <View style={[styles.storyImage, styles.storyAvatarFallback]}>
+            <Text style={styles.storyAvatarLetter}>{story.author.displayName.slice(0, 1).toUpperCase()}</Text>
           </View>
         ) : null}
       </View>
-      <Text style={styles.storyLabel} numberOfLines={1}>{story.label}</Text>
+      <Text style={styles.storyLabel} numberOfLines={1}>{story.author.displayName}</Text>
     </Pressable>
   );
 }
@@ -412,7 +431,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     position: "relative",
   },
+  ownStoryRing: { borderColor: "#D9DDE4" },
+  activeStoryRing: { borderColor: "#E84A8A" },
   storyImage: { width: 46, height: 46, borderRadius: 23 },
+  storyAvatarFallback: { alignItems: "center", justifyContent: "center", backgroundColor: "#E9EEF8" },
+  storyAvatarLetter: { color: "#46566F", fontSize: 17, fontWeight: "700" },
   storyAdd: {
     position: "absolute",
     right: -2,

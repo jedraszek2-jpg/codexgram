@@ -13,6 +13,7 @@ import type * as lib_auth from "../lib/auth.js";
 import type * as media from "../media.js";
 import type * as messages from "../messages.js";
 import type * as social from "../social.js";
+import type * as stories from "../stories.js";
 
 import type {
   ApiFromModules,
@@ -26,6 +27,7 @@ declare const fullApi: ApiFromModules<{
   media: typeof media;
   messages: typeof messages;
   social: typeof social;
+  stories: typeof stories;
 }>;
 
 /**

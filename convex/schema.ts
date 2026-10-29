@@ -90,4 +90,13 @@ export default defineSchema({
   })
     .index("by_conversation_and_created_at", ["conversationId", "createdAt"])
     .index("by_sender", ["senderId"]),
+
+  stories: defineTable({
+    authorId: v.id("profiles"),
+    mediaId: v.id("_storage"),
+    createdAt: v.number(),
+    expiresAt: v.number(),
+  })
+    .index("by_author_and_expires_at", ["authorId", "expiresAt"])
+    .index("by_expires_at", ["expiresAt"]),
 });

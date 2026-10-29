@@ -30,7 +30,7 @@
         "expo-image-picker",
         {
           "photosPermission": "Codexgram accesses your photo library so you can share a moment.",
-          "cameraPermission": false,
+          "cameraPermission": "Codexgram uses your camera to capture a story photo.",
           "microphonePermission": false
         }
       ],
