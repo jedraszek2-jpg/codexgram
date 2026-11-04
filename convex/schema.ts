@@ -8,6 +8,7 @@ export default defineSchema({
     normalizedUsername: v.string(),
     displayName: v.string(),
     avatarUrl: v.optional(v.string()),
+    avatarStorageId: v.optional(v.id("_storage")),
     bio: v.optional(v.string()),
     accountStatus: v.union(v.literal("active"), v.literal("suspended")),
     followerCount: v.number(),
@@ -17,7 +18,9 @@ export default defineSchema({
     updatedAt: v.number(),
   })
     .index("by_token_identifier", ["tokenIdentifier"])
-    .index("by_normalized_username", ["normalizedUsername"]),
+    .index("by_normalized_username", ["normalizedUsername"])
+    .index("by_avatar_url", ["avatarUrl"])
+    .index("by_avatar_storage_id", ["avatarStorageId"]),
 
   follows: defineTable({
     followerId: v.id("profiles"),
@@ -40,7 +43,8 @@ export default defineSchema({
     createdAt: v.number(),
   })
     .index("by_owner", ["ownerId"])
-    .index("by_upload_state", ["uploadState"]),
+    .index("by_upload_state", ["uploadState"])
+    .index("by_storage_id", ["storageId"]),
 
   posts: defineTable({
     authorId: v.id("profiles"),
@@ -78,7 +82,10 @@ export default defineSchema({
     postId: v.optional(v.id("posts")),
     createdAt: v.number(),
     isRead: v.boolean(),
-  }).index("by_recipient_and_created_at", ["recipientId", "createdAt"]),
+  })
+    .index("by_recipient_and_created_at", ["recipientId", "createdAt"])
+    .index("by_actor_and_created_at", ["actorId", "createdAt"])
+    .index("by_post", ["postId"]),
 
   conversations: defineTable({
     member1Id: v.id("profiles"),
@@ -106,6 +113,7 @@ export default defineSchema({
     createdAt: v.number(),
     expiresAt: v.number(),
   })
+    .index("by_media_id", ["mediaId"])
     .index("by_author_and_expires_at", ["authorId", "expiresAt"])
     .index("by_expires_at", ["expiresAt"]),
 });

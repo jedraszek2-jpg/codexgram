@@ -15,6 +15,7 @@ import type * as media from "../media.js";
 import type * as messages from "../messages.js";
 import type * as social from "../social.js";
 import type * as stories from "../stories.js";
+import type * as users from "../users.js";
 
 import type {
   ApiFromModules,
@@ -30,6 +31,7 @@ declare const fullApi: ApiFromModules<{
   messages: typeof messages;
   social: typeof social;
   stories: typeof stories;
+  users: typeof users;
 }>;
 
 /**

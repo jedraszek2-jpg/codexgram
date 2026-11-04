@@ -1,22 +1,26 @@
 import { useClerk } from "@clerk/expo";
 import { api } from "../../../convex/_generated/api";
-import { useQuery } from "convex/react";
+import { useAction, useMutation, useQuery } from "convex/react";
 import { SymbolView } from "expo-symbols";
 import { StatusBar } from "expo-status-bar";
 import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ProfileContent } from "../../components/ProfileContent";
 import { useTranslation } from "react-i18next";
+import { useState } from "react";
 
 export default function ProfileTab() {
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const { signOut } = useClerk();
+  const deleteMyAccount = useMutation(api.social.deleteMyAccount);
+  const deleteClerkUser = useAction(api.users.deleteClerkUser);
   const currentProfile = useQuery(api.social.myProfile, {});
   const data = useQuery(
     api.social.profileById,
     currentProfile ? { profileId: currentProfile._id } : "skip",
   );
+  const [deletingAccount, setDeletingAccount] = useState(false);
   const scale = Math.min(width / 250, 1.45);
 
   const handleSignOut = async () => {
@@ -27,9 +31,48 @@ export default function ProfileTab() {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    if (deletingAccount) return;
+    setDeletingAccount(true);
+    let convexDataDeleted = false;
+    try {
+      await deleteMyAccount({});
+      convexDataDeleted = true;
+      await deleteClerkUser({});
+    } catch {
+      Alert.alert(
+        t("profile.deleteAccount"),
+        convexDataDeleted
+          ? t("profile.deleteAccountClerkFailed")
+          : t("profile.deleteAccountFailed"),
+      );
+    }
+
+    if (convexDataDeleted) {
+      try {
+        await signOut();
+      } catch {
+        Alert.alert(t("profile.signOutFailed"), t("common.tryAgain"));
+      }
+    }
+    setDeletingAccount(false);
+  };
+
+  const showDeleteAccountConfirmation = () => {
+    Alert.alert(t("profile.deleteAccount"), t("profile.deleteAccountWarning"), [
+      { text: t("common.cancel"), style: "cancel" },
+      {
+        text: t("profile.deleteAccount"),
+        style: "destructive",
+        onPress: () => void handleDeleteAccount(),
+      },
+    ]);
+  };
+
   const showProfileOptions = () => {
     Alert.alert(t("profile.options"), "", [
       { text: t("profile.logOut"), style: "destructive", onPress: () => void handleSignOut() },
+      { text: t("profile.deleteAccount"), style: "destructive", onPress: showDeleteAccountConfirmation },
       { text: t("common.cancel"), style: "cancel" },
     ]);
   };

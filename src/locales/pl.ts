@@ -37,6 +37,10 @@ const pl = {
   },
   profile: {
     logOut: "Wyloguj", signOutFailed: "Nie udało się wylogować.", options: "Opcje profilu",
+    deleteAccount: "Usuń konto",
+    deleteAccountWarning: "Usunięcie konta usunie wszystkie Twoje posty, komentarze i wiadomości. Będziesz mógł jednak zarejestrować się ponownie na ten sam e-mail. Czy na pewno chcesz usunąć konto?",
+    deleteAccountFailed: "Nie udało się usunąć danych konta. Spróbuj ponownie.",
+    deleteAccountClerkFailed: "Dane w aplikacji zostały usunięte, ale nie udało się usunąć konta logowania w Clerk.",
     unavailable: "Profil jest niedostępny.", home: "Strona profilu",
     viewingOwnProfile: "Wyświetlasz swój profil.", camera: "Aparat", cameraComingSoon: "Aparat będzie dostępny wkrótce.",
   },

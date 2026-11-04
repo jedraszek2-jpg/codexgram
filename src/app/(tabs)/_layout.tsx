@@ -1,19 +1,30 @@
 import { useAuth } from "@clerk/expo";
+import { useQuery } from "convex/react";
 import { NativeTabs } from "expo-router/unstable-native-tabs";
 import { Redirect } from "expo-router";
-import { View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 import { useTranslation } from "react-i18next";
+import { api } from "../../../convex/_generated/api";
 
 export default function TabsLayout() {
   const { t } = useTranslation();
   const { isLoaded, isSignedIn } = useAuth({ treatPendingAsSignedOut: false });
+  const profile = useQuery(api.social.myProfile, isSignedIn ? {} : "skip");
 
-  if (!isLoaded && !isSignedIn) {
-    return <View style={{ flex: 1, backgroundColor: "#FFFFFF" }} />;
+  if (!isLoaded || (isSignedIn && profile === undefined)) {
+    return (
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#FFFFFF" }}>
+        <ActivityIndicator color="#287BFF" />
+      </View>
+    );
   }
 
   if (!isSignedIn) {
-    return <Redirect href="/" />;
+    return <Redirect href="/sign-in" />;
+  }
+
+  if (profile === null) {
+    return <Redirect href="/onboarding" />;
   }
 
   return (

@@ -26,6 +26,10 @@ const en = {
   },
   profile: {
     logOut: "Log out", signOutFailed: "Sign out failed.", options: "Profile options",
+    deleteAccount: "Delete account",
+    deleteAccountWarning: "Deleting your account will remove all your posts, comments, and messages. You can register again using the same email address. Are you sure you want to delete your account?",
+    deleteAccountFailed: "Your account data could not be deleted. Please try again.",
+    deleteAccountClerkFailed: "Your app data was deleted, but Clerk could not delete your sign-in account.",
     unavailable: "Your profile is unavailable.", home: "Profile home",
     viewingOwnProfile: "You are viewing your profile.", camera: "Camera", cameraComingSoon: "Camera is coming soon.",
   },

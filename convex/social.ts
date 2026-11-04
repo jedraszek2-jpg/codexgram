@@ -1,7 +1,7 @@
 ﻿import { internalMutation, internalQuery, mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-import type { Doc } from "./_generated/dataModel";
-import type { QueryCtx } from "./_generated/server";
+import type { Doc, Id } from "./_generated/dataModel";
+import type { MutationCtx, QueryCtx } from "./_generated/server";
 import { requireIdentity, requireProfile } from "./lib/auth";
 
 const profileDoc = v.object({
@@ -12,6 +12,7 @@ const profileDoc = v.object({
   normalizedUsername: v.string(),
   displayName: v.string(),
   avatarUrl: v.optional(v.string()),
+  avatarStorageId: v.optional(v.id("_storage")),
   bio: v.optional(v.string()),
   accountStatus: v.union(v.literal("active"), v.literal("suspended")),
   followerCount: v.number(),
@@ -20,6 +21,80 @@ const profileDoc = v.object({
   createdAt: v.number(),
   updatedAt: v.number(),
 });
+
+function storageIdFromUrl(
+  ctx: MutationCtx,
+  avatarUrl?: string,
+): Id<"_storage"> | undefined {
+  if (!avatarUrl) return undefined;
+  try {
+    const pathname = new URL(avatarUrl).pathname;
+    const prefix = "/api/storage/";
+    if (!pathname.startsWith(prefix)) return undefined;
+    const encodedId = pathname.slice(prefix.length);
+    if (!encodedId || encodedId.includes("/")) return undefined;
+    return ctx.db.system.normalizeId("_storage", decodeURIComponent(encodedId)) ?? undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+async function hasOtherStorageReferences(
+  ctx: MutationCtx,
+  profileId: Id<"profiles">,
+  storageId: Id<"_storage">,
+  storageUrl: string,
+): Promise<boolean> {
+  for await (const profile of ctx.db
+    .query("profiles")
+    .withIndex("by_avatar_storage_id", (q) => q.eq("avatarStorageId", storageId))) {
+    if (profile._id !== profileId) return true;
+  }
+  for await (const profile of ctx.db
+    .query("profiles")
+    .withIndex("by_avatar_url", (q) => q.eq("avatarUrl", storageUrl))) {
+    if (profile._id !== profileId) return true;
+  }
+  for await (const media of ctx.db
+    .query("media")
+    .withIndex("by_storage_id", (q) => q.eq("storageId", storageId))) {
+    if (media.ownerId !== profileId) return true;
+  }
+  for await (const story of ctx.db
+    .query("stories")
+    .withIndex("by_media_id", (q) => q.eq("mediaId", storageId))) {
+    if (story.authorId !== profileId) return true;
+  }
+  return false;
+}
+
+async function deleteStorageFileIfUnreferenced(
+  ctx: MutationCtx,
+  profileId: Id<"profiles">,
+  storageId: Id<"_storage">,
+): Promise<void> {
+  try {
+    const storageUrl = await ctx.storage.getUrl(storageId);
+    if (!storageUrl) return;
+    if (await hasOtherStorageReferences(ctx, profileId, storageId, storageUrl)) return;
+    const metadata = await ctx.db.system.get("_storage", storageId);
+    if (metadata) await ctx.storage.delete(storageId);
+  } catch {
+    // A problem with one file must not stop account deletion.
+  }
+}
+
+async function deleteConversation(
+  ctx: MutationCtx,
+  conversationId: Id<"conversations">,
+): Promise<void> {
+  for await (const message of ctx.db
+    .query("messages")
+    .withIndex("by_conversation_and_created_at", (q) => q.eq("conversationId", conversationId))) {
+    await ctx.db.delete(message._id);
+  }
+  await ctx.db.delete(conversationId);
+}
 
 const profileSummary = v.object({
   _id: v.id("profiles"),
@@ -196,7 +271,7 @@ export const createProfile = mutation({
       username,
       normalizedUsername,
       displayName,
-      ...(avatarUrl ? { avatarUrl } : {}),
+      ...(avatarUrl ? { avatarUrl, avatarStorageId: args.avatarStorageId } : {}),
       accountStatus: "active",
       followerCount: 0,
       followingCount: 0,
@@ -217,8 +292,150 @@ export const updateMyAvatar = mutation({
     const profile = await requireProfile(ctx);
     const avatarUrl = await ctx.storage.getUrl(args.storageId);
     if (!avatarUrl) throw new Error("The profile photo could not be loaded.");
-    await ctx.db.patch(profile._id, { avatarUrl, updatedAt: Date.now() });
+    const previousStorageId =
+      profile.avatarStorageId ?? storageIdFromUrl(ctx, profile.avatarUrl);
+    if (previousStorageId && previousStorageId !== args.storageId) {
+      await deleteStorageFileIfUnreferenced(ctx, profile._id, previousStorageId);
+    }
+    await ctx.db.patch(profile._id, {
+      avatarUrl,
+      avatarStorageId: args.storageId,
+      updatedAt: Date.now(),
+    });
     return avatarUrl;
+  },
+});
+
+export const deleteMyAccount = mutation({
+  args: {},
+  returns: v.null(),
+  handler: async (ctx) => {
+    const profile = await requireProfile(ctx);
+
+    const avatarStorageId =
+      profile.avatarStorageId ?? storageIdFromUrl(ctx, profile.avatarUrl);
+    if (avatarStorageId) {
+      await deleteStorageFileIfUnreferenced(ctx, profile._id, avatarStorageId);
+    }
+
+    for await (const post of ctx.db
+      .query("posts")
+      .withIndex("by_author_and_created_at", (q) => q.eq("authorId", profile._id))) {
+      const mediaDoc = await ctx.db.get(post.mediaId);
+      if (!mediaDoc) continue;
+      if (mediaDoc.storageId) {
+        await deleteStorageFileIfUnreferenced(ctx, profile._id, mediaDoc.storageId);
+      }
+      await ctx.db.delete(post.mediaId);
+    }
+    for await (const story of ctx.db
+      .query("stories")
+      .withIndex("by_author_and_expires_at", (q) => q.eq("authorId", profile._id))) {
+      await deleteStorageFileIfUnreferenced(ctx, profile._id, story.mediaId);
+      await ctx.db.delete(story._id);
+    }
+    for await (const media of ctx.db
+      .query("media")
+      .withIndex("by_owner", (q) => q.eq("ownerId", profile._id))) {
+      if (media.storageId) {
+        await deleteStorageFileIfUnreferenced(ctx, profile._id, media.storageId);
+      }
+      await ctx.db.delete(media._id);
+    }
+
+    for await (const like of ctx.db
+      .query("likes")
+      .withIndex("by_profile", (q) => q.eq("profileId", profile._id))) {
+      const post = await ctx.db.get(like.postId);
+      if (post && post.authorId !== profile._id) {
+        await ctx.db.patch(post._id, { likeCount: Math.max(0, post.likeCount - 1) });
+      }
+      await ctx.db.delete(like._id);
+    }
+
+    for await (const comment of ctx.db
+      .query("comments")
+      .withIndex("by_author", (q) => q.eq("authorId", profile._id))) {
+      const post = await ctx.db.get(comment.postId);
+      if (post && post.authorId !== profile._id) {
+        await ctx.db.patch(post._id, { commentCount: Math.max(0, post.commentCount - 1) });
+      }
+      await ctx.db.delete(comment._id);
+    }
+
+    for await (const activity of ctx.db
+      .query("activities")
+      .withIndex("by_recipient_and_created_at", (q) => q.eq("recipientId", profile._id))) {
+      await ctx.db.delete(activity._id);
+    }
+    for await (const activity of ctx.db
+      .query("activities")
+      .withIndex("by_actor_and_created_at", (q) => q.eq("actorId", profile._id))) {
+      await ctx.db.delete(activity._id);
+    }
+
+    for await (const follow of ctx.db
+      .query("follows")
+      .withIndex("by_follower", (q) => q.eq("followerId", profile._id))) {
+      const followedProfile = await ctx.db.get(follow.followingId);
+      if (followedProfile) {
+        await ctx.db.patch(followedProfile._id, {
+          followerCount: Math.max(0, followedProfile.followerCount - 1),
+        });
+      }
+      await ctx.db.delete(follow._id);
+    }
+    for await (const follow of ctx.db
+      .query("follows")
+      .withIndex("by_following", (q) => q.eq("followingId", profile._id))) {
+      const followerProfile = await ctx.db.get(follow.followerId);
+      if (followerProfile) {
+        await ctx.db.patch(followerProfile._id, {
+          followingCount: Math.max(0, followerProfile.followingCount - 1),
+        });
+      }
+      await ctx.db.delete(follow._id);
+    }
+
+    for await (const message of ctx.db
+      .query("messages")
+      .withIndex("by_sender", (q) => q.eq("senderId", profile._id))) {
+      await ctx.db.delete(message._id);
+    }
+    for await (const conversation of ctx.db
+      .query("conversations")
+      .withIndex("by_member1_and_last_message_at", (q) => q.eq("member1Id", profile._id))) {
+      await deleteConversation(ctx, conversation._id);
+    }
+    for await (const conversation of ctx.db
+      .query("conversations")
+      .withIndex("by_member2_and_last_message_at", (q) => q.eq("member2Id", profile._id))) {
+      await deleteConversation(ctx, conversation._id);
+    }
+
+    for await (const post of ctx.db
+      .query("posts")
+      .withIndex("by_author_and_created_at", (q) => q.eq("authorId", profile._id))) {
+      for await (const comment of ctx.db
+        .query("comments")
+        .withIndex("by_post_and_created_at", (q) => q.eq("postId", post._id))) {
+        await ctx.db.delete(comment._id);
+      }
+      for await (const like of ctx.db
+        .query("likes")
+        .withIndex("by_post_and_profile", (q) => q.eq("postId", post._id))) {
+        await ctx.db.delete(like._id);
+      }
+      for await (const activity of ctx.db
+        .query("activities")
+        .withIndex("by_post", (q) => q.eq("postId", post._id))) {
+        await ctx.db.delete(activity._id);
+      }
+      await ctx.db.delete(post._id);
+    }
+
+    await ctx.db.delete(profile._id);
+    return null;
   },
 });
 
