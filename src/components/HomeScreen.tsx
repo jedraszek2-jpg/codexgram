@@ -22,6 +22,8 @@ import {
 import { CommentsSheet } from "./CommentsSheet";
 import { StoryViewer } from "./StoryViewer";
 import type { StoryGroup } from "./StoryViewer";
+import { useTranslation } from "react-i18next";
+import i18n from "../lib/i18n";
 
 type FeedPost = {
   _id: Id<"posts">;
@@ -42,6 +44,7 @@ type FeedPost = {
 };
 
 export default function HomeScreen() {
+  const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const feed = useQuery(api.social.homeFeed, {});
   const [storiesNow, setStoriesNow] = useState(() => Date.now());
@@ -63,8 +66,8 @@ export default function HomeScreen() {
     setPendingLikes((current) => new Set(current).add(postId));
     try {
       await toggleLike({ postId });
-    } catch (cause) {
-      Alert.alert("Like failed", cause instanceof Error ? cause.message : "Please try again.");
+    } catch {
+      Alert.alert(t("home.likeFailed"), t("common.tryAgain"));
     } finally {
       setPendingLikes((current) => {
         const next = new Set(current);
@@ -90,7 +93,7 @@ export default function HomeScreen() {
         <View style={styles.headerActions}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Create a post"
+            accessibilityLabel={t("home.createPost")}
             hitSlop={8}
             onPress={() => router.push("/create-post")}
             style={({ pressed }) => [styles.createButton, pressed && styles.pressed]}
@@ -99,7 +102,7 @@ export default function HomeScreen() {
           </Pressable>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Notifications"
+            accessibilityLabel={t("home.notifications")}
             hitSlop={8}
             onPress={() => router.push("/activity")}
             style={({ pressed }) => [styles.headerIconButton, pressed && styles.pressed]}
@@ -133,14 +136,14 @@ export default function HomeScreen() {
             <ActivityIndicator color="#3A86FF" style={styles.loading} />
           ) : (
             <View style={styles.emptyState}>
-              <Text style={styles.emptyTitle}>Your feed is waiting</Text>
-              <Text style={styles.emptyText}>Follow people in Explore or share your first post.</Text>
+              <Text style={styles.emptyTitle}>{t("home.emptyTitle")}</Text>
+              <Text style={styles.emptyText}>{t("home.emptyText")}</Text>
               <Pressable
                 accessibilityRole="button"
                 onPress={() => router.push("/explore")}
                 style={styles.exploreButton}
               >
-                <Text style={styles.exploreButtonLabel}>Explore people</Text>
+                <Text style={styles.exploreButtonLabel}>{t("home.explorePeople")}</Text>
               </Pressable>
             </View>
           )
@@ -174,11 +177,12 @@ function StoriesRail({
   onCreate: () => void;
   onOpen: (index: number) => void;
 }) {
+  const { t } = useTranslation();
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.stories}>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Add to your story"
+        accessibilityLabel={t("home.addToStory")}
         onPress={onCreate}
         style={({ pressed }) => [styles.storyItem, pressed && styles.pressed]}
       >
@@ -188,7 +192,7 @@ function StoriesRail({
             <SymbolView name={{ ios: "plus", android: "add", web: "add" }} tintColor="#FFFFFF" size={12} />
           </View>
         </View>
-        <Text style={styles.storyLabel} numberOfLines={1}>Your story</Text>
+        <Text style={styles.storyLabel} numberOfLines={1}>{t("home.yourStory")}</Text>
       </Pressable>
       {stories?.map((story, index) => (
         <StoryItem key={story.author._id} story={story} onPress={() => onOpen(index)} />
@@ -210,13 +214,14 @@ function FeedPostCard({
   onLike: () => void;
   onComments: () => void;
 }) {
+  const { t } = useTranslation();
   const mediaHeight = width * (159 / 228);
   const openAuthorProfile = () => router.push({ pathname: "/user/[id]", params: { id: post.author._id } });
   const openPostDetails = () => router.push({ pathname: "/post/[id]", params: { id: post._id } });
-  const showPostOptions = () => Alert.alert("Opcje posta", undefined, [
-    { text: "Zobacz profil", onPress: openAuthorProfile },
-    { text: "Zobacz post", onPress: openPostDetails },
-    { text: "Anuluj", style: "cancel" },
+  const showPostOptions = () => Alert.alert(t("home.optionsTitle"), undefined, [
+    { text: t("home.optionViewProfile"), onPress: openAuthorProfile },
+    { text: t("home.optionViewPost"), onPress: openPostDetails },
+    { text: t("common.cancel"), style: "cancel" },
   ]);
 
   return (
@@ -224,7 +229,7 @@ function FeedPostCard({
       <View style={styles.postHeader}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={"View " + post.author.displayName + "'s profile"}
+          accessibilityLabel={t("common.viewProfile", { name: post.author.displayName })}
           onPress={openAuthorProfile}
           style={styles.postAuthor}
         >
@@ -233,7 +238,7 @@ function FeedPostCard({
               source={{ uri: post.author.avatarUrl }}
               style={styles.postAvatar}
               contentFit="cover"
-              accessibilityLabel={post.author.displayName + " profile photo"}
+              accessibilityLabel={t("common.profilePhoto", { name: post.author.displayName })}
             />
           ) : (
             <View style={[styles.postAvatar, styles.avatarFallback]}>
@@ -246,7 +251,7 @@ function FeedPostCard({
         </Pressable>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="More post options"
+          accessibilityLabel={t("common.moreOptions")}
           hitSlop={10}
           onPress={showPostOptions}
           style={styles.moreButton}
@@ -260,7 +265,7 @@ function FeedPostCard({
       ) : (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="View post details"
+          accessibilityLabel={t("common.viewPostDetails")}
           onPress={openPostDetails}
           style={styles.postPhotoButton}
         >
@@ -279,7 +284,7 @@ function FeedPostCard({
           <View style={styles.actionGroup}>
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel={post.isLiked ? "Unlike post" : "Like post"}
+              accessibilityLabel={post.isLiked ? t("common.unlikePost") : t("common.likePost")}
               accessibilityState={{ selected: post.isLiked, disabled: likePending }}
               disabled={likePending}
               hitSlop={8}
@@ -298,7 +303,7 @@ function FeedPostCard({
             </Pressable>
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel="View comments"
+              accessibilityLabel={t("home.viewComments")}
               hitSlop={8}
               onPress={onComments}
               style={styles.actionButton}
@@ -307,9 +312,9 @@ function FeedPostCard({
             </Pressable>
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel="Share post"
+              accessibilityLabel={t("home.sharePost")}
               hitSlop={8}
-              onPress={() => Alert.alert("Share", "Sharing is coming soon.")}
+              onPress={() => Alert.alert(t("home.share"), t("home.shareComingSoon"))}
               style={styles.actionButton}
             >
               <SymbolView name={{ ios: "paperplane", android: "send", web: "send" }} tintColor="#1F1F1F" size={21} />
@@ -317,11 +322,11 @@ function FeedPostCard({
           </View>
         </View>
 
-        <Text style={styles.likes}>{post.likeCount.toLocaleString()} likes</Text>
+        <Text style={styles.likes}>{t("home.likes", { count: post.likeCount, formattedCount: post.likeCount.toLocaleString(i18n.resolvedLanguage) })}</Text>
         {post.caption ? (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="View post details"
+            accessibilityLabel={t("common.viewPostDetails")}
             onPress={openPostDetails}
           >
             <Text style={styles.caption}>
@@ -332,12 +337,14 @@ function FeedPostCard({
         ) : null}
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={"View " + post.commentCount + " comments"}
+          accessibilityLabel={t("home.viewCommentsCount", { count: post.commentCount })}
           onPress={onComments}
           hitSlop={4}
         >
           <Text style={styles.comments}>
-            {post.commentCount > 0 ? "View all " + post.commentCount + " comments" : "Add a comment"}
+            {post.commentCount > 0
+              ? t("home.allComments", { count: post.commentCount, formattedCount: post.commentCount.toLocaleString(i18n.resolvedLanguage) })
+              : t("home.addComment")}
           </Text>
         </Pressable>
         <Text style={styles.timestamp}>{timeAgo(post.createdAt)}</Text>
@@ -347,6 +354,7 @@ function FeedPostCard({
 }
 
 function VideoPostMedia({ uri, width, height }: { uri: string; width: number; height: number }) {
+  const { t } = useTranslation();
   const player = useVideoPlayer(uri, (instance) => {
     instance.muted = true;
     instance.loop = true;
@@ -356,18 +364,19 @@ function VideoPostMedia({ uri, width, height }: { uri: string; width: number; he
       player={player}
       nativeControls
       contentFit="cover"
-      accessibilityLabel="Video post"
+      accessibilityLabel={t("post.videoAccessibility")}
       style={[styles.postImage, { width, height }]}
     />
   );
 }
 
 function StoryItem({ story, onPress }: { story: StoryGroup; onPress: () => void }) {
-  const title = story.author.displayName + "'s story";
+  const { t } = useTranslation();
+  const title = t("home.storyBy", { name: story.author.displayName });
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={"View " + title}
+      accessibilityLabel={t("home.viewStory", { name: story.author.displayName })}
       onPress={onPress}
       style={({ pressed }) => [styles.storyItem, pressed && styles.pressed]}
     >
@@ -388,11 +397,11 @@ function StoryItem({ story, onPress }: { story: StoryGroup; onPress: () => void 
 
 function timeAgo(createdAt: number) {
   const minutes = Math.max(0, Math.floor((Date.now() - createdAt) / 60_000));
-  if (minutes < 1) return "Just now";
-  if (minutes < 60) return minutes + "m ago";
+  if (minutes < 1) return i18n.t("time.justNow");
+  if (minutes < 60) return i18n.t("time.minutesAgo", { count: minutes });
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return hours + "h ago";
-  return Math.floor(hours / 24) + "d ago";
+  if (hours < 24) return i18n.t("time.hoursAgo", { count: hours });
+  return i18n.t("time.daysAgo", { count: Math.floor(hours / 24) });
 }
 
 const styles = StyleSheet.create({

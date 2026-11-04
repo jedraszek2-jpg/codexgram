@@ -9,6 +9,7 @@ import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
 import { useConvexAuth, useMutation } from "convex/react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Pressable,
@@ -23,6 +24,7 @@ const MAX_IMAGE_BYTES = 15 * 1024 * 1024;
 const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
 
 export default function CreatePostScreen() {
+  const { t } = useTranslation();
   const { isAuthenticated, isLoading } = useConvexAuth();
   const requestUpload = useMutation(api.media.generateUploadUrl);
   const finalizeUpload = useMutation(api.media.finalizeUpload);
@@ -64,11 +66,13 @@ export default function CreatePostScreen() {
         const byteSize = asset.fileSize ?? file.size;
         const maxBytes = mediaType === "image" ? MAX_IMAGE_BYTES : MAX_VIDEO_BYTES;
         if (!byteSize || byteSize > maxBytes) {
-          throw new Error(mediaType === "image" ? "Photos must be 15 MB or smaller." : "Videos must be 50 MB or smaller.");
+          setError(mediaType === "image" ? t("createPost.photoLimit", { maxMb: 15 }) : t("createPost.videoLimit", { maxMb: 50 }));
+          return;
         }
         const durationSeconds = asset.duration == null ? undefined : asset.duration / 1000;
         if (mediaType === "video" && (!durationSeconds || durationSeconds > 30)) {
-          throw new Error("Videos must be 30 seconds or shorter.");
+          setError(t("createPost.videoDuration", { maxSeconds: 30 }));
+          return;
         }
 
         const upload = await requestUpload({
@@ -87,10 +91,14 @@ export default function CreatePostScreen() {
         });
         const result = await task.uploadAsync().finally(() => task.release());
         if (result.status < 200 || result.status >= 300) {
-          throw new Error("The media upload failed. Please retry.");
+          setError(t("createPost.uploadFailed", { status: result.status }));
+          return;
         }
         const uploadResult = JSON.parse(result.body) as { storageId?: Id<"_storage"> };
-        if (!uploadResult.storageId) throw new Error("The media upload response was invalid.");
+        if (!uploadResult.storageId) {
+          setError(t("createPost.uploadResponseInvalid"));
+          return;
+        }
         await finalizeUpload({ mediaId: upload.mediaId, storageId: uploadResult.storageId });
         mediaId = upload.mediaId;
         setUploadedMediaId(mediaId);
@@ -98,8 +106,8 @@ export default function CreatePostScreen() {
 
       await createPost({ mediaId, caption });
       router.replace("/home");
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Your post could not be published. Please retry.");
+    } catch {
+      setError(t("createPost.publishFailed"));
     } finally {
       setIsPublishing(false);
     }
@@ -111,24 +119,24 @@ export default function CreatePostScreen() {
     <SafeAreaView style={styles.safeArea} edges={["top", "right", "left"]}>
       <StatusBar style="dark" />
       <View style={styles.header}>
-        <Pressable accessibilityRole="button" accessibilityLabel="Close create post" onPress={() => router.back()}>
-          <Text style={styles.cancel}>Cancel</Text>
+        <Pressable accessibilityRole="button" accessibilityLabel={t("createPost.close")} onPress={() => router.back()}>
+          <Text style={styles.cancel}>{t("common.cancel")}</Text>
         </Pressable>
-        <Text accessibilityRole="header" style={styles.title}>New post</Text>
+        <Text accessibilityRole="header" style={styles.title}>{t("createPost.title")}</Text>
         <Pressable
           accessibilityRole="button"
           disabled={!asset || isPublishing}
           onPress={() => void publish()}
           style={[styles.publishButton, (!asset || isPublishing) && styles.disabled]}
         >
-          <Text style={styles.publishLabel}>{isPublishing ? "Posting..." : "Share"}</Text>
+          <Text style={styles.publishLabel}>{isPublishing ? t("createPost.posting") : t("createPost.share")}</Text>
         </Pressable>
       </View>
 
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={asset ? "Choose different photo or video" : "Choose photo or video"}
+          accessibilityLabel={asset ? t("createPost.chooseAnother") : t("createPost.chooseMedia")}
           onPress={() => void chooseMedia()}
           style={styles.preview}
         >
@@ -138,25 +146,25 @@ export default function CreatePostScreen() {
             <Image source={{ uri: asset.uri }} contentFit="contain" style={styles.previewMedia} />
           ) : (
             <View style={styles.emptyPreview}>
-              <Text style={styles.plus}>ďĽ‹</Text>
-              <Text style={styles.previewTitle}>Choose a photo or video</Text>
-              <Text style={styles.previewHint}>One item per post. Videos up to 30 seconds.</Text>
+              <Text style={styles.plus}>+</Text>
+              <Text style={styles.previewTitle}>{t("createPost.previewTitle")}</Text>
+              <Text style={styles.previewHint}>{t("createPost.previewHint")}</Text>
             </View>
           )}
         </Pressable>
 
         {asset ? (
           <Pressable accessibilityRole="button" onPress={() => void chooseMedia()} style={styles.changeMedia}>
-            <Text style={styles.changeMediaText}>Choose a different item</Text>
+            <Text style={styles.changeMediaText}>{t("createPost.changeMedia")}</Text>
           </Pressable>
         ) : null}
 
         <TextInput
-          accessibilityLabel="Write a caption"
+          accessibilityLabel={t("createPost.caption")}
           maxLength={2200}
           multiline
           onChangeText={setCaption}
-          placeholder="Write a caption..."
+          placeholder={t("createPost.captionPlaceholder")}
           placeholderTextColor="#8A9099"
           style={styles.caption}
           value={caption}
@@ -165,7 +173,7 @@ export default function CreatePostScreen() {
         {isPublishing ? (
           <View style={styles.progressSection}>
             <Text style={styles.progressLabel}>
-              {uploadedMediaId ? "Publishing your post..." : "Uploading media " + Math.round(progress * 100) + "%"}
+              {uploadedMediaId ? t("createPost.publishingPost") : t("createPost.uploadingPercent", { percent: Math.round(progress * 100) })}
             </Text>
             <View style={styles.progressTrack}>
               <View style={[styles.progressFill, { width: `${Math.round(progress * 100)}%` as `${number}%` }]} />
@@ -180,6 +188,7 @@ export default function CreatePostScreen() {
 }
 
 function VideoPreview({ uri }: { uri: string }) {
+  const { t } = useTranslation();
   const player = useVideoPlayer(uri, (instance) => {
     instance.muted = true;
     instance.loop = true;
@@ -190,7 +199,7 @@ function VideoPreview({ uri }: { uri: string }) {
       nativeControls
       contentFit="contain"
       style={styles.previewMedia}
-      accessibilityLabel="Video preview"
+      accessibilityLabel={t("createPost.videoPreview")}
     />
   );
 }

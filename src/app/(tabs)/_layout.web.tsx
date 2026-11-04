@@ -2,8 +2,10 @@ import { useAuth } from "@clerk/expo";
 import { Redirect } from "expo-router";
 import { TabList, TabSlot, Tabs, TabTrigger } from "expo-router/ui";
 import { StyleSheet, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 export default function TabsWebLayout() {
+  const { t } = useTranslation();
   const { isLoaded, isSignedIn } = useAuth({ treatPendingAsSignedOut: false });
 
   if (!isLoaded && !isSignedIn) {
@@ -19,16 +21,16 @@ export default function TabsWebLayout() {
       <TabSlot />
       <TabList style={styles.tabList}>
         <TabTrigger name="home" href="/home" style={styles.tab}>
-          Home
+          {t("tabs.home")}
         </TabTrigger>
         <TabTrigger name="messages" href="/messages" style={styles.tab}>
-          Messages
+          {t("tabs.messages")}
         </TabTrigger>
         <TabTrigger name="explore" href="/explore" style={styles.tab}>
-          Explore
+          {t("tabs.explore")}
         </TabTrigger>
         <TabTrigger name="profile" href="/profile" style={styles.tab}>
-          Profile
+          {t("tabs.profile")}
         </TabTrigger>
       </TabList>
     </Tabs>

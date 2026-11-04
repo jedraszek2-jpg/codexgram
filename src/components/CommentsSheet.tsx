@@ -2,6 +2,7 @@ import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   FlatList,
@@ -24,6 +25,7 @@ type Props = {
 };
 
 export function CommentsSheet({ postId, visible, onClose }: Props) {
+  const { t } = useTranslation();
   const comments = useQuery(api.social.commentsForPost, postId ? { postId } : "skip");
   const addComment = useMutation(api.social.addComment);
   const removeComment = useMutation(api.social.removeComment);
@@ -37,21 +39,21 @@ export function CommentsSheet({ postId, visible, onClose }: Props) {
       await addComment({ postId, body });
       setBody("");
     } catch (cause) {
-      Alert.alert("Comment failed", cause instanceof Error ? cause.message : "Please try again.");
+      Alert.alert(t("comments.addFailed"), t("common.tryAgain"));
     } finally {
       setSending(false);
     }
   };
 
   const confirmDelete = (commentId: Id<"comments">) => {
-    Alert.alert("Delete comment?", "This comment will be removed.", [
-      { text: "Cancel", style: "cancel" },
+    Alert.alert(t("comments.deleteTitle"), t("comments.deleteBody"), [
+      { text: t("common.cancel"), style: "cancel" },
       {
-        text: "Delete",
+        text: t("comments.delete"),
         style: "destructive",
         onPress: () => {
           void removeComment({ commentId }).catch((cause: unknown) => {
-            Alert.alert("Delete failed", cause instanceof Error ? cause.message : "Please try again.");
+            Alert.alert(t("comments.deleteFailed"), t("common.tryAgain"));
           });
         },
       },
@@ -71,10 +73,10 @@ export function CommentsSheet({ postId, visible, onClose }: Props) {
           behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
           <View style={styles.header}>
-            <Pressable accessibilityRole="button" accessibilityLabel="Close comments" onPress={onClose}>
-              <Text style={styles.close}>Close</Text>
+            <Pressable accessibilityRole="button" accessibilityLabel={t("comments.close")} onPress={onClose}>
+              <Text style={styles.close}>{t("common.close")}</Text>
             </Pressable>
-            <Text accessibilityRole="header" style={styles.title}>Comments</Text>
+            <Text accessibilityRole="header" style={styles.title}>{t("comments.title")}</Text>
             <View style={styles.headerSpacer} />
           </View>
 
@@ -85,7 +87,7 @@ export function CommentsSheet({ postId, visible, onClose }: Props) {
             keyboardShouldPersistTaps="handled"
             ListEmptyComponent={
               <Text style={styles.empty}>
-                {comments === undefined ? "Loading comments..." : "Be the first to comment."}
+                {comments === undefined ? t("comments.loading") : t("comments.first")}
               </Text>
             }
             renderItem={({ item }) => (
@@ -106,11 +108,11 @@ export function CommentsSheet({ postId, visible, onClose }: Props) {
                 {item.canDelete ? (
                   <Pressable
                     accessibilityRole="button"
-                    accessibilityLabel="Delete comment"
+                    accessibilityLabel={t("comments.deleteAccessibility")}
                     hitSlop={8}
                     onPress={() => confirmDelete(item._id)}
                   >
-                    <Text style={styles.delete}>Delete</Text>
+                    <Text style={styles.delete}>{t("comments.delete")}</Text>
                   </Pressable>
                 ) : null}
               </View>
@@ -119,23 +121,23 @@ export function CommentsSheet({ postId, visible, onClose }: Props) {
 
           <View style={styles.composer}>
             <TextInput
-              accessibilityLabel="Write a comment"
+              accessibilityLabel={t("comments.writeAccessibility")}
               maxLength={500}
               multiline
               onChangeText={setBody}
-              placeholder="Add a comment..."
+              placeholder={t("comments.placeholder")}
               placeholderTextColor="#8A9099"
               style={styles.input}
               value={body}
             />
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel="Post comment"
+              accessibilityLabel={t("comments.postAccessibility")}
               disabled={!body.trim() || sending}
               onPress={() => void submit()}
               style={[styles.sendButton, (!body.trim() || sending) && styles.disabled]}
             >
-              <Text style={styles.sendText}>{sending ? "..." : "Post"}</Text>
+              <Text style={styles.sendText}>{sending ? "…" : t("comments.post")}</Text>
             </Pressable>
           </View>
         </KeyboardAvoidingView>

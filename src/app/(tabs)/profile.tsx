@@ -6,8 +6,10 @@ import { StatusBar } from "expo-status-bar";
 import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ProfileContent } from "../../components/ProfileContent";
+import { useTranslation } from "react-i18next";
 
 export default function ProfileTab() {
+  const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const { signOut } = useClerk();
   const currentProfile = useQuery(api.social.myProfile, {});
@@ -21,14 +23,14 @@ export default function ProfileTab() {
     try {
       await signOut();
     } catch {
-      Alert.alert("Sign out failed", "Please try again.");
+      Alert.alert(t("profile.signOutFailed"), t("common.tryAgain"));
     }
   };
 
   const showProfileOptions = () => {
-    Alert.alert("Profile options", "", [
-      { text: "Sign out", style: "destructive", onPress: () => void handleSignOut() },
-      { text: "Cancel", style: "cancel" },
+    Alert.alert(t("profile.options"), "", [
+      { text: t("profile.logOut"), style: "destructive", onPress: () => void handleSignOut() },
+      { text: t("common.cancel"), style: "cancel" },
     ]);
   };
 
@@ -43,7 +45,7 @@ export default function ProfileTab() {
   if (!currentProfile || !data) {
     return (
       <SafeAreaView style={styles.screen} edges={["top", "right", "left"]}>
-        <Text style={styles.emptyText}>Your profile is unavailable.</Text>
+        <Text style={styles.emptyText}>{t("profile.unavailable")}</Text>
       </SafeAreaView>
     );
   }
@@ -55,8 +57,8 @@ export default function ProfileTab() {
         <View style={[styles.topBar, { height: 34 * scale, paddingHorizontal: 10 * scale }]}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Profile home"
-            onPress={() => Alert.alert("Codexgram", "You are viewing your profile.")}
+            accessibilityLabel={t("profile.home")}
+            onPress={() => Alert.alert("Codexgram", t("profile.viewingOwnProfile"))}
             hitSlop={8}
             style={styles.topAction}
           >
@@ -68,8 +70,8 @@ export default function ProfileTab() {
           <View style={styles.topRightActions}>
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel="Camera"
-              onPress={() => Alert.alert("Camera", "Camera is coming soon.")}
+              accessibilityLabel={t("profile.camera")}
+              onPress={() => Alert.alert(t("profile.camera"), t("profile.cameraComingSoon"))}
               hitSlop={8}
               style={styles.topAction}
             >
@@ -77,7 +79,7 @@ export default function ProfileTab() {
             </Pressable>
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel="Profile options"
+              accessibilityLabel={t("profile.options")}
               onPress={showProfileOptions}
               hitSlop={8}
               style={styles.topAction}

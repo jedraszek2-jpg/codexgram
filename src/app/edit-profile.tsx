@@ -8,6 +8,8 @@ import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
+import i18n, { setAppLanguage } from "../lib/i18n";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Alert,
@@ -28,6 +30,7 @@ type ProfileDraft = {
 };
 
 export default function EditProfileScreen() {
+  const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const scale = Math.min(width / 250, 1.5);
   const profile = useQuery(api.social.myProfile, {});
@@ -37,7 +40,9 @@ export default function EditProfileScreen() {
   const [draft, setDraft] = useState<ProfileDraft | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [location, setLocation] = useState("Poland");
+  const [location, setLocation] = useState<"Poland" | "USA">(
+    () => (i18n.resolvedLanguage ?? i18n.language) === "pl" ? "Poland" : "USA",
+  );
   const [avatarPreviewUri, setAvatarPreviewUri] = useState<string | null>(null);
   const [avatarUrlOverride, setAvatarUrlOverride] = useState<string | null>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
@@ -55,11 +60,10 @@ export default function EditProfileScreen() {
   };
 
   const chooseLocation = () => {
-    Alert.alert("Location", "Choose your location", [
-      { text: "Poland", onPress: () => setLocation("Poland") },
-      { text: "Italy", onPress: () => setLocation("Italy") },
-      { text: "France", onPress: () => setLocation("France") },
-      { text: "Cancel", style: "cancel" },
+    Alert.alert(t("editProfile.location"), t("editProfile.chooseLocation"), [
+      { text: t("editProfile.poland"), onPress: () => setLocation("Poland") },
+      { text: t("editProfile.usa"), onPress: () => setLocation("USA") },
+      { text: t("common.cancel"), style: "cancel" },
     ]);
   };
 
@@ -67,7 +71,7 @@ export default function EditProfileScreen() {
     try {
       const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (!permission.granted) {
-        Alert.alert("Permission required", "Allow photo library access to choose a profile photo.");
+        Alert.alert(t("editProfile.permissionRequired"), t("editProfile.allowPhotoLibrary"));
         return;
       }
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -113,9 +117,9 @@ export default function EditProfileScreen() {
       const avatarUrl = await updateMyAvatar({ storageId: uploadResult.storageId as Id<"_storage"> });
       setAvatarUrlOverride(avatarUrl);
       setAvatarPreviewUri(null);
-    } catch (cause) {
+    } catch {
       setAvatarPreviewUri(null);
-      Alert.alert("Profile photo failed", cause instanceof Error ? cause.message : "Please try again.");
+      Alert.alert(t("editProfile.photoFailed"), t("common.tryAgain"));
     } finally {
       setAvatarUploading(false);
     }
@@ -126,11 +130,22 @@ export default function EditProfileScreen() {
     setSaving(true);
     setSaveError(null);
     try {
-      await updateMyProfile(values);
+      try {
+        await updateMyProfile(values);
+      } catch (cause) {
+        setSaveError(t("editProfile.saveFailed"));
+        return;
+      }
+
+      try {
+        await setAppLanguage(location === "Poland" ? "pl" : "en");
+      } catch {
+        setSaveError(t("editProfile.languageSaveFailed"));
+        return;
+      }
+
       setDraft(null);
       router.back();
-    } catch (cause) {
-      setSaveError(cause instanceof Error ? cause.message : "Your profile could not be saved.");
     } finally {
       setSaving(false);
     }
@@ -146,9 +161,9 @@ export default function EditProfileScreen() {
   if (profile === null) {
     return (
       <SafeAreaView style={styles.screen} edges={["top", "right", "left"]}>
-        <Text style={styles.error}>Your profile is not available.</Text>
+        <Text style={styles.error}>{t("editProfile.unavailable")}</Text>
         <Pressable accessibilityRole="button" onPress={() => router.back()}>
-          <Text style={styles.backLabel}>Go back</Text>
+          <Text style={styles.backLabel}>{t("editProfile.goBack")}</Text>
         </Pressable>
       </SafeAreaView>
     );
@@ -161,7 +176,7 @@ export default function EditProfileScreen() {
         <View style={[styles.header, { height: 40 * scale, paddingHorizontal: 12 * scale }]}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Go back"
+            accessibilityLabel={t("common.back")}
             hitSlop={8}
             onPress={() => router.back()}
             style={[styles.headerAction, { width: 34 * scale }]}
@@ -172,7 +187,7 @@ export default function EditProfileScreen() {
               style={{ width: 17 * scale, height: 17 * scale }}
             />
           </Pressable>
-          <Text style={[styles.title, { fontSize: 13 * scale }]}>Edit Profile</Text>
+          <Text style={[styles.title, { fontSize: 13 * scale }]}>{t("editProfile.title")}</Text>
           <Pressable
             accessibilityRole="button"
             accessibilityState={{ disabled: saving }}
@@ -180,20 +195,20 @@ export default function EditProfileScreen() {
             onPress={() => void saveProfile()}
             style={[styles.headerAction, styles.saveAction, { width: 48 * scale }]}
           >
-            <Text style={[styles.saveLabel, { fontSize: 11 * scale }]}>{saving ? "Saving..." : "Save"}</Text>
+            <Text style={[styles.saveLabel, { fontSize: 11 * scale }]}>{saving ? t("editProfile.saving") : t("editProfile.save")}</Text>
           </Pressable>
         </View>
 
         <View style={[styles.avatarWrap, { width: 74 * scale, height: 74 * scale, marginTop: 5 * scale }]}>
           <Image
-            accessibilityLabel="Profile photo"
+            accessibilityLabel={t("editProfile.profilePhoto")}
             contentFit="cover"
             source={avatarUri ? { uri: avatarUri } : require("../../assets/images/profile-avatar.png")}
             style={styles.avatar}
           />
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Change profile photo"
+            accessibilityLabel={t("editProfile.changeProfilePhoto")}
             accessibilityState={{ disabled: avatarUploading }}
             disabled={avatarUploading}
             onPress={() => void chooseAvatar()}
@@ -213,14 +228,14 @@ export default function EditProfileScreen() {
 
         <View style={[styles.form, { paddingHorizontal: 16 * scale, marginTop: 10 * scale }]}>
           <ProfileField
-            label="Display name"
+            label={t("editProfile.displayName")}
             value={values.displayName}
             onChangeText={(value) => updateField("displayName", value)}
             scale={scale}
             maxLength={50}
           />
           <ProfileField
-            label="Username"
+            label={t("editProfile.username")}
             value={values.username}
             onChangeText={(value) => updateField("username", value)}
             scale={scale}
@@ -230,7 +245,7 @@ export default function EditProfileScreen() {
             containerStyle={{ marginTop: 12 * scale }}
           />
           <ProfileField
-            label="Bio"
+            label={t("editProfile.bio")}
             value={values.bio}
             onChangeText={(value) => updateField("bio", value)}
             scale={scale}
@@ -240,10 +255,10 @@ export default function EditProfileScreen() {
           />
 
           <View style={[styles.field, { marginTop: 6 * scale }]}>
-            <Text style={[styles.label, { fontSize: 10 * scale, marginBottom: 3 * scale }]}>Location</Text>
+            <Text style={[styles.label, { fontSize: 10 * scale, marginBottom: 3 * scale }]}>{t("editProfile.location")}</Text>
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel={"Location, " + location}
+              accessibilityLabel={t("editProfile.locationAccessibility", { location: t(location === "Poland" ? "editProfile.poland" : "editProfile.usa") })}
               onPress={chooseLocation}
               style={[styles.locationInput, { height: 29 * scale, borderRadius: 7 * scale, paddingHorizontal: 8 * scale }]}
             >
@@ -252,7 +267,7 @@ export default function EditProfileScreen() {
                 tintColor="#24272C"
                 style={{ width: 14 * scale, height: 14 * scale }}
               />
-              <Text style={[styles.inputText, { fontSize: 11 * scale, marginLeft: 6 * scale }]}>{location}</Text>
+              <Text style={[styles.inputText, { fontSize: 11 * scale, marginLeft: 6 * scale }]}>{t(location === "Poland" ? "editProfile.poland" : "editProfile.usa")}</Text>
               <SymbolView
                 name={{ ios: "chevron.right", android: "chevron_right", web: "chevron_right" }}
                 tintColor="#526071"
