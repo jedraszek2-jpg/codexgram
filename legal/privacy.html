@@ -1,0 +1,787 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#11131b" />
+    <meta
+      name="description"
+      content="Draft Privacy Policy for Codexgram, an invitation-only social app beta."
+    />
+    <title>Privacy Policy — Codexgram</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #171923;
+        --muted: #667085;
+        --blue: #3978f6;
+        --paper: #f7f8fb;
+        --line: #e7e9ef;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+      }
+
+      a {
+        color: #245bd0;
+        text-underline-offset: 3px;
+      }
+
+      .masthead {
+        color: #fff;
+        background: #11131b;
+      }
+
+      .nav,
+      .hero,
+      .content,
+      .footer-inner {
+        width: min(1060px, calc(100% - 48px));
+        margin: 0 auto;
+      }
+
+      .nav {
+        display: flex;
+        height: 74px;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid rgb(255 255 255 / 10%);
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: #fff;
+        font-size: 17px;
+        font-weight: 750;
+        letter-spacing: -0.045em;
+        text-decoration: none;
+      }
+
+      .brand-mark {
+        display: grid;
+        width: 30px;
+        height: 30px;
+        place-items: center;
+        border-radius: 10px;
+        background: linear-gradient(145deg, #62a1ff, #8148ee 58%, #d746a8);
+      }
+
+      .brand-mark::before {
+        width: 11px;
+        height: 11px;
+        border: 1.5px solid white;
+        border-radius: 4px;
+        content: "";
+      }
+
+      .back-link {
+        color: #c5cad6;
+        font-size: 12px;
+        text-decoration: none;
+      }
+
+      .hero {
+        padding: 48px 0 52px;
+      }
+
+      .eyebrow {
+        color: #9fbaff;
+        font-size: 10px;
+        font-weight: 750;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 14px 0 10px;
+        font-size: clamp(36px, 6vw, 58px);
+        letter-spacing: -0.07em;
+      }
+
+      .hero p {
+        max-width: 690px;
+        margin: 0;
+        color: #b6bac6;
+        font-size: 14px;
+        line-height: 1.7;
+      }
+
+      .draft-label {
+        display: inline-flex;
+        margin-top: 21px;
+        border: 1px solid rgb(255 255 255 / 17%);
+        border-radius: 999px;
+        padding: 8px 12px;
+        color: #e4e9f5;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .content {
+        display: grid;
+        grid-template-columns: 220px minmax(0, 1fr);
+        align-items: start;
+        gap: 42px;
+        padding-top: 42px;
+        padding-bottom: 76px;
+      }
+
+      .toc {
+        position: sticky;
+        top: 20px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px;
+        background: #fff;
+      }
+
+      .toc h2 {
+        margin: 0 0 13px;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .toc ol {
+        display: grid;
+        gap: 10px;
+        margin: 0;
+        padding-left: 18px;
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.45;
+      }
+
+      .toc a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .toc a:hover {
+        color: var(--blue);
+      }
+
+      .policy {
+        min-width: 0;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: clamp(24px, 5vw, 48px);
+        background: #fff;
+      }
+
+      .policy section + section {
+        margin-top: 35px;
+        border-top: 1px solid var(--line);
+        padding-top: 28px;
+      }
+
+      .policy h2 {
+        margin: 0 0 13px;
+        font-size: 20px;
+        letter-spacing: -0.045em;
+        line-height: 1.3;
+      }
+
+      .policy h3 {
+        margin: 23px 0 8px;
+        font-size: 15px;
+        letter-spacing: -0.025em;
+      }
+
+      .policy p,
+      .policy li,
+      .policy td,
+      .policy th {
+        color: #454c5a;
+        font-size: 13px;
+        line-height: 1.8;
+      }
+
+      .policy p {
+        margin: 10px 0;
+      }
+
+      .policy ul,
+      .policy ol {
+        display: grid;
+        gap: 7px;
+        padding-left: 22px;
+      }
+
+      .policy table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 16px 0;
+      }
+
+      .policy th,
+      .policy td {
+        border: 1px solid var(--line);
+        padding: 10px 12px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      .policy th {
+        background: #f7f8fb;
+        color: var(--ink);
+        font-weight: 700;
+      }
+
+      .placeholder {
+        border-radius: 4px;
+        padding: 1px 4px;
+        background: #fff1ca;
+        color: #744f00;
+        overflow-wrap: anywhere;
+      }
+
+      .important {
+        border-left: 3px solid var(--blue);
+        padding: 13px 16px;
+        background: #f2f6ff;
+      }
+
+      .reviewer-notes {
+        margin-top: 48px;
+        border: 1px solid #e8c76d;
+        border-radius: 15px;
+        padding: 22px;
+        background: #fff9e8;
+      }
+
+      .reviewer-notes h2 {
+        color: #664a0b;
+      }
+
+      .reviewer-notes p,
+      .reviewer-notes li {
+        color: #66572f;
+      }
+
+      .footer {
+        background: #11131b;
+        color: #aeb3c0;
+      }
+
+      .footer-inner {
+        display: flex;
+        min-height: 82px;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        border-top: 1px solid rgb(255 255 255 / 10%);
+        font-size: 11px;
+      }
+
+      .footer a {
+        color: #c5cad6;
+        text-decoration: none;
+      }
+
+      .footer a:hover {
+        color: #fff;
+      }
+
+      .footer-links {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+      }
+
+      @media (max-width: 820px) {
+        .content {
+          grid-template-columns: 1fr;
+          gap: 18px;
+        }
+
+        .toc {
+          position: static;
+        }
+
+        .toc ol {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 560px) {
+        .nav,
+        .hero,
+        .content,
+        .footer-inner {
+          width: min(100% - 36px, 520px);
+        }
+
+        .hero {
+          padding: 38px 0;
+        }
+
+        .content {
+          padding-top: 22px;
+          padding-bottom: 48px;
+        }
+
+        .toc ol {
+          grid-template-columns: 1fr;
+        }
+
+        .policy table,
+        .policy tbody,
+        .policy tr,
+        .policy th,
+        .policy td {
+          display: block;
+        }
+
+        .policy tr + tr {
+          margin-top: 12px;
+        }
+
+        .policy th {
+          border-bottom: 0;
+        }
+
+        .footer-inner {
+          flex-wrap: wrap;
+          justify-content: flex-start;
+          padding: 20px 0;
+        }
+
+        .footer-links {
+          flex-wrap: wrap;
+          gap: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="masthead">
+      <nav class="nav" aria-label="Main navigation">
+        <a class="brand" href="./landing.html">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span>codexgram</span>
+        </a>
+        <a class="back-link" href="./landing.html">Back to Codexgram</a>
+      </nav>
+      <div class="hero">
+        <div class="eyebrow">Privacy</div>
+        <h1>Privacy Policy</h1>
+        <p>
+          This draft explains the personal information Codexgram handles to provide its
+          invitation-only social app beta and the choices available to you.
+        </p>
+        <span class="draft-label">Draft — complete highlighted items before publication</span>
+      </div>
+    </header>
+
+    <main class="content">
+      <nav class="toc" aria-label="Table of contents">
+        <h2>On this page</h2>
+        <ol>
+          <li><a href="#controller">Who is responsible</a></li>
+          <li><a href="#scope">Who may use Codexgram</a></li>
+          <li><a href="#data">Information we handle</a></li>
+          <li><a href="#use">How and why we use it</a></li>
+          <li><a href="#sharing">Who can receive it</a></li>
+          <li><a href="#visibility">Who can see your content</a></li>
+          <li><a href="#transfers">Storage and international transfers</a></li>
+          <li><a href="#retention">Retention and deletion</a></li>
+          <li><a href="#security">Security and automated processing</a></li>
+          <li><a href="#choices">Your choices and rights</a></li>
+          <li><a href="#cookies">Cookies and local storage</a></li>
+          <li><a href="#children">Children</a></li>
+          <li><a href="#changes">Changes and contact</a></li>
+        </ol>
+      </nav>
+
+      <article class="policy">
+        <p>
+          <strong>Effective date:</strong> <span class="placeholder">[Effective date]</span>
+          · <strong>Last updated:</strong> <span class="placeholder">[Last updated]</span>
+        </p>
+
+        <section id="controller">
+          <h2>1. Who is responsible</h2>
+          <p>
+            Codexgram is operated as an unregistered student project by Andrew Studio.
+            The controller responsible for personal data processed through Codexgram is
+            <span class="placeholder">[Full legal name of controller]</span>, at
+            <span class="placeholder">[Postal address]</span>, Poland (“we,” “us,” or “our”).
+          </p>
+          <p>
+            For privacy questions or requests, contact
+            <a href="mailto:contact@codexgram.app">[contact@codexgram.app]</a>
+            <span class="placeholder">[Confirm this inbox is monitored for privacy requests]</span>.
+          </p>
+        </section>
+
+        <section id="scope">
+          <h2>2. Who may use Codexgram</h2>
+          <p>
+            Codexgram is an invitation-only beta intended for people aged 18 or older.
+            The app does not ask for a date of birth or technically verify age or invitations.
+            Do not use the Service if you do not meet these requirements.
+          </p>
+          <p>
+            This Policy applies to the Codexgram mobile app and its current web build. It
+            does not cover third-party services that link to or provide access to Codexgram;
+            those services publish their own privacy information.
+          </p>
+        </section>
+
+        <section id="data">
+          <h2>3. Information we handle</h2>
+          <p>Depending on how you use Codexgram, we and our service providers handle:</p>
+          <ul>
+            <li>
+              <strong>Sign-in and account information:</strong> your account identifier and
+              authentication information managed by Clerk. Sign-in is available through
+              Google OAuth or email and password. If you choose Google, Google and Clerk
+              process information needed to authenticate you; the exact fields returned by
+              Google depend on your Google account and settings.
+            </li>
+            <li>
+              <strong>Profile information:</strong> username, display name, profile photo
+              or avatar, bio, account status, and profile creation/update times. The app
+              may initialize profile details from your Clerk account, including your
+              username, name, and image URL.
+            </li>
+            <li>
+              <strong>Content and media:</strong> posts, captions, comments, stories,
+              photos, videos, and text messages you submit. We also handle technical media
+              details such as file type, size, duration when applicable, storage reference,
+              and upload time. The app does not include code that strips image metadata
+              before upload.
+            </li>
+            <li>
+              <strong>Social and usage information:</strong> follows, likes, comments,
+              activity notifications, conversation membership, messages, and associated
+              timestamps and read status.
+            </li>
+            <li>
+              <strong>Language preference:</strong> the app reads your device language
+              setting to choose a default language and stores your selected English or
+              Polish language locally on your device. The profile screen’s “Location”
+              choice changes the app language; it does not save a physical location.
+            </li>
+          </ul>
+          <p>
+            We do not request access to your contacts or location in the app. Photo-library
+            access is used when you select media; camera access is used to take a story
+            photo. Microphone permission is disabled in the app configuration. Content you
+            select may itself contain information or image metadata you did not intend to
+            share.
+          </p>
+          <p>
+            We do not collect your Clerk password in the Codexgram Convex database. We do
+            not currently provide AI features, ads, or product analytics. Provider-generated
+            technical logs and diagnostics are governed by provider configuration and
+            retention, which may not be visible in the app code.
+          </p>
+        </section>
+
+        <section id="use">
+          <h2>4. How and why we use information</h2>
+          <p>
+            We use the information above to create and authenticate accounts; maintain
+            profiles; host and display content; provide feeds, search, follows, likes,
+            comments, stories, activity and messaging; operate account deletion; protect
+            the Service; and respond to support, legal, or privacy requests.
+          </p>
+          <p>
+            The following legal bases are provisional drafting assumptions and must be
+            checked by the controller and a qualified privacy lawyer before publication:
+          </p>
+          <ul>
+            <li>
+              <strong>Contract:</strong> account, profile, content, social, and messaging
+              processing needed to provide the features you request.
+            </li>
+            <li>
+              <strong>Legitimate interests:</strong> maintaining and securing the beta,
+              preventing misuse, and troubleshooting, where those interests do not override
+              your rights.
+            </li>
+            <li>
+              <strong>Consent:</strong> only where consent is legally required for a
+              particular processing activity. Device permission prompts let you control
+              access to selected photos or the camera; they do not by themselves establish
+              the legal basis for every related processing activity.
+            </li>
+            <li>
+              <strong>Legal obligation:</strong> where processing is necessary to comply
+              with applicable law.
+            </li>
+          </ul>
+          <p class="important">
+            These legal bases are not yet a verified record of processing. The controller
+            must confirm the purpose-by-purpose basis and whether any consent mechanism is
+            needed before this Policy is published.
+          </p>
+        </section>
+
+        <section id="sharing">
+          <h2>5. Who can receive information</h2>
+          <ul>
+            <li>
+              <strong>Convex:</strong> provides the backend database and file storage. The
+              configured Convex deployment region has been reported as EU (eu-west-1);
+              confirm this in the deployment dashboard before publication.
+            </li>
+            <li>
+              <strong>Clerk:</strong> provides account authentication. Its configured data
+              region has not been confirmed; the placeholder
+              <span class="placeholder">[Vendor Default / EU — confirm in Clerk dashboard]</span>
+              must be resolved. Clerk may process sign-in information and authentication
+              identifiers to provide its service.
+            </li>
+            <li>
+              <strong>Google:</strong> if you choose Google OAuth, Google processes
+              authentication data under its own terms and privacy policy. Google is an
+              identity provider, not identified here as a Codexgram backend processor.
+              See <a href="https://policies.google.com/privacy">Google Privacy Policy</a>
+              and <a href="https://policies.google.com/terms">Google Terms</a>.
+            </li>
+            <li>
+              <strong>Other users:</strong> information you choose to make visible through
+              profiles, posts, comments, stories, likes, follows, and messages is shared
+              as described in Section 6.
+            </li>
+          </ul>
+          <p>
+            We do not currently integrate an advertising, analytics, crash-reporting, or
+            push-notification SDK. The operator reports Convex and Clerk as the only
+            configured backend processors/subprocessors. Google is a separate identity
+            provider when you choose Google sign-in. Confirm the current provider
+            subprocessor lists and any web hosting provider before publication.
+          </p>
+          <p>
+            We may also disclose information if required by law or a valid legal request,
+            or where reasonably necessary to protect users, the Service, or legal rights.
+            This is a description of possible legal compliance, not a claim that such
+            disclosures are routinely made.
+          </p>
+        </section>
+
+        <section id="visibility">
+          <h2>6. Who can see your content</h2>
+          <ul>
+            <li>
+              Profiles and posts are available to signed-in, active Codexgram members.
+              Information in your profile and content may therefore be seen by members
+              you do not personally know.
+            </li>
+            <li>
+              Stories are returned in the active-story feed to members who follow the
+              author. They stop appearing as active after 24 hours, but this expiry does
+              not itself delete the stored media file.
+            </li>
+            <li>
+              Direct messages are available in the app to the members of the conversation.
+              They are not end-to-end encrypted. Do not send information that must remain
+              confidential.
+            </li>
+            <li>
+              Media is served through Convex Storage URLs. A person who obtains a media
+              URL may be able to access the associated file; do not assume that a link is
+              private merely because it is not shown in a public profile.
+            </li>
+          </ul>
+          <p>
+            Other members may copy, capture, or share content they can view. We cannot
+            control copies made outside the Service.
+          </p>
+        </section>
+
+        <section id="transfers">
+          <h2>7. Storage and international transfers</h2>
+          <p>
+            The Convex deployment is reported as hosted in the EU region eu-west-1. Clerk’s
+            data region, the locations used for provider logs/backups, and Google’s
+            processing locations have not been verified. Information may be processed
+            outside your country, including outside the European Economic Area, depending
+            on the provider and your sign-in choice.
+          </p>
+          <p>
+            Before publication, confirm each provider’s applicable transfer mechanism and
+            safeguards and replace
+            <span class="placeholder">[Describe applicable transfer safeguards, if any]</span>.
+            Do not infer that every copy, subprocessor, or log remains in the Convex
+            deployment region.
+          </p>
+        </section>
+
+        <section id="retention">
+          <h2>8. Retention and deletion</h2>
+          <p>
+            We retain account information, profile data, content, and social records while
+            needed to operate your account and the features you use. You can initiate
+            account deletion from the profile screen. The app attempts to delete associated
+            Convex records and files and then separately requests deletion of your Clerk
+            account.
+          </p>
+          <p>
+            Deletion is not guaranteed to remove every copy immediately. File deletion is
+            best-effort; the Clerk request can fail after Convex data has been deleted;
+            and the app does not configure its own backup retention schedule. Convex and
+            Clerk data, backups, and logs may remain according to
+            <span class="placeholder">[Vendor Default Retention Period]</span>
+            and applicable provider policies. The provider retention periods and deletion
+            behavior have not been confirmed. Contact us if deletion reports an error.
+          </p>
+          <p>
+            A story ceasing to appear after 24 hours is not the same as deletion of its
+            stored file. We do not currently provide an in-app control to export or
+            download all account data.
+          </p>
+        </section>
+
+        <section id="security">
+          <h2>9. Security and automated processing</h2>
+          <p>
+            The app connects Clerk authentication with Convex backend access. On native
+            devices, the Clerk Expo token cache uses Expo SecureStore; the web build does
+            not use that native token cache. These implementation details do not guarantee
+            that every system, provider, or transmission is secure. No method of storage
+            or transmission can be represented as risk-free.
+          </p>
+          <p>
+            We do not currently use AI to generate content, make decisions about users, or
+            profile users for advertising. We have not identified automated decisions
+            producing legal or similarly significant effects. Activity updates and feed
+            behavior are app features, not an AI decision system.
+          </p>
+        </section>
+
+        <section id="choices">
+          <h2>10. Your choices and privacy rights</h2>
+          <p>
+            You can edit profile details, choose which content to submit, change the app
+            language, sign out, or initiate account deletion in the app. You can deny
+            photo-library or camera permissions in your device settings, although related
+            features may then be unavailable.
+          </p>
+          <p>
+            If the GDPR or another privacy law applies, you may have rights to request
+            access to, correction of, or deletion of your personal data; restriction of or
+            objection to certain processing; and portability where applicable. You may
+            withdraw consent where processing relies on consent, without affecting
+            processing already carried out. You may also complain to your relevant
+            supervisory authority; in Poland this is the President of the Personal Data
+            Protection Office (UODO).
+          </p>
+          <p>
+            To make a privacy request, email
+            <a href="mailto:contact@codexgram.app">[contact@codexgram.app]</a>. We may need
+            to verify your identity before responding. No in-app data-access or export
+            workflow is currently available. Applicable law may limit or condition a
+            particular right.
+          </p>
+        </section>
+
+        <section id="cookies">
+          <h2>11. Cookies and local storage</h2>
+          <p>
+            Codexgram does not currently configure advertising or product-analytics
+            cookies or SDKs. The web sign-in experience is supplied by Clerk and may use
+            essential cookies or browser storage for authentication and security. The
+            precise browser storage behavior depends on Clerk’s web configuration and
+            should be checked in the deployed site before publication.
+          </p>
+          <p>
+            On native devices, the selected language is stored locally using AsyncStorage,
+            and Clerk uses the native SecureStore token cache described above. These
+            settings are not an in-app advertising or analytics profile.
+          </p>
+        </section>
+
+        <section id="children">
+          <h2>12. Children</h2>
+          <p>
+            Codexgram is intended only for invited adults aged 18 or older. We do not
+            knowingly design the beta for children, and the app does not collect a date
+            of birth or verify age. If you believe a child has provided personal data,
+            contact us at the address below so we can review the request.
+          </p>
+        </section>
+
+        <section id="changes">
+          <h2>13. Changes and contact</h2>
+          <p>
+            We may update this Policy as the beta or its providers change. We will update
+            the “Last updated” date and, where required, give notice of material changes.
+            Continued use after an update is subject to applicable law; it does not
+            replace consent where consent is required.
+          </p>
+          <p>
+            Privacy contact: <span class="placeholder">[Full legal name of controller]</span>,
+            <span class="placeholder">[Postal address]</span>, Poland; email
+            <a href="mailto:contact@codexgram.app">[contact@codexgram.app]</a>
+            <span class="placeholder">[Confirm monitored inbox]</span>.
+          </p>
+        </section>
+
+        <aside class="reviewer-notes" aria-labelledby="reviewer-notes-title">
+          <h2 id="reviewer-notes-title">Reviewer notes — remove before publication</h2>
+          <ul>
+            <li>
+              This document is a draft based on the current repository and operator
+              confirmations, not a verified description of all production settings.
+            </li>
+            <li>
+              Fill in the controller’s full legal name and postal address, effective and
+              update dates, monitored privacy contact, Clerk region, vendor retention
+              details, and applicable international-transfer safeguards.
+            </li>
+            <li>
+              Verify Convex’s actual deployment and storage URLs, Clerk’s OAuth and
+              browser-storage configuration, Google’s returned OAuth fields, provider
+              subprocessors/logs, and the website hosting provider. Update this document
+              if any differ from the assumptions above.
+            </li>
+            <li>
+              Confirm the legal basis for each processing purpose, the age/invitation
+              eligibility policy, and the process for handling data-subject requests.
+              The app has no age gate or in-app data export.
+            </li>
+            <li>
+              The deletion flow is not a guarantee of immediate or complete erasure from
+              provider backups, logs, or stored files.
+            </li>
+            <li>
+              Have this draft reviewed by a qualified attorney familiar with Polish and
+              EU data-protection law before publication.
+            </li>
+          </ul>
+        </aside>
+      </article>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <span>© 2026 Andrew Studio · Student project beta</span>
+        <div class="footer-links">
+          <a href="./terms.html">Terms of Service</a>
+          <a href="./landing.html">Codexgram</a>
+          <a href="mailto:contact@codexgram.app">[contact@codexgram.app]</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

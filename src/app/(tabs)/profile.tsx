@@ -1,4 +1,4 @@
-import { useClerk } from "@clerk/expo";
+import { useAuth, useClerk } from "@clerk/expo";
 import { api } from "../../../convex/_generated/api";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { SymbolView } from "expo-symbols";
@@ -12,13 +12,14 @@ import { useState } from "react";
 export default function ProfileTab() {
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
+  const { isSignedIn } = useAuth({ treatPendingAsSignedOut: false });
   const { signOut } = useClerk();
   const deleteMyAccount = useMutation(api.social.deleteMyAccount);
   const deleteClerkUser = useAction(api.users.deleteClerkUser);
-  const currentProfile = useQuery(api.social.myProfile, {});
+  const currentProfile = useQuery(api.social.myProfile, isSignedIn ? {} : "skip");
   const data = useQuery(
     api.social.profileById,
-    currentProfile ? { profileId: currentProfile._id } : "skip",
+    isSignedIn && currentProfile ? { profileId: currentProfile._id } : "skip",
   );
   const [deletingAccount, setDeletingAccount] = useState(false);
   const scale = Math.min(width / 250, 1.45);

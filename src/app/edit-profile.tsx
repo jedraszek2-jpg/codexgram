@@ -1,3 +1,4 @@
+import { useAuth } from "@clerk/expo";
 import { router } from "expo-router";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
@@ -31,9 +32,10 @@ type ProfileDraft = {
 
 export default function EditProfileScreen() {
   const { t } = useTranslation();
+  const { isSignedIn } = useAuth({ treatPendingAsSignedOut: false });
   const { width } = useWindowDimensions();
   const scale = Math.min(width / 250, 1.5);
-  const profile = useQuery(api.social.myProfile, {});
+  const profile = useQuery(api.social.myProfile, isSignedIn ? {} : "skip");
   const updateMyProfile = useMutation(api.social.updateMyProfile);
   const generateProfileImageUploadUrl = useMutation(api.social.generateProfileImageUploadUrl);
   const updateMyAvatar = useMutation(api.social.updateMyAvatar);

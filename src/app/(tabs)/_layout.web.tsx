@@ -1,15 +1,19 @@
 import { useAuth } from "@clerk/expo";
 import { Redirect } from "expo-router";
 import { TabList, TabSlot, Tabs, TabTrigger } from "expo-router/ui";
-import { StyleSheet, View } from "react-native";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
 export default function TabsWebLayout() {
   const { t } = useTranslation();
   const { isLoaded, isSignedIn } = useAuth({ treatPendingAsSignedOut: false });
 
-  if (!isLoaded && !isSignedIn) {
-    return <View style={{ flex: 1, backgroundColor: "#FFFFFF" }} />;
+  if (!isLoaded) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator color="#287BFF" />
+      </View>
+    );
   }
 
   if (!isSignedIn) {
@@ -38,6 +42,12 @@ export default function TabsWebLayout() {
 }
 
 const styles = StyleSheet.create({
+  loading: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#FFFFFF",
+  },
   tabList: {
     flexDirection: "row",
     justifyContent: "space-around",

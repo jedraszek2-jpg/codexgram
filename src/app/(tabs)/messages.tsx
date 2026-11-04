@@ -1,3 +1,4 @@
+import { useAuth } from "@clerk/expo";
 import { useQuery } from "convex/react";
 import { Image } from "expo-image";
 import { router } from "expo-router";
@@ -12,7 +13,11 @@ function formatTime(timestamp: number) {
 }
 
 export default function MessagesTab() {
-  const conversations = useQuery(api.messages.getMyConversations, {});
+  const { isSignedIn } = useAuth({ treatPendingAsSignedOut: false });
+  const conversations = useQuery(
+    api.messages.getMyConversations,
+    isSignedIn ? {} : "skip",
+  );
 
   return (
     <SafeAreaView style={styles.screen} edges={["top", "right", "left"]}>

@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#11131b" />
+    <meta
+      name="description"
+      content="Draft Terms of Service for Codexgram, an invitation-only student project beta."
+    />
+    <title>Terms of Service — Codexgram</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #171923;
+        --muted: #667085;
+        --blue: #3978f6;
+        --paper: #f7f8fb;
+        --line: #e7e9ef;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+      }
+
+      a {
+        color: #245bd0;
+        text-underline-offset: 3px;
+      }
+
+      .masthead {
+        color: #fff;
+        background: #11131b;
+      }
+
+      .nav,
+      .hero,
+      .content,
+      .footer-inner {
+        width: min(1060px, calc(100% - 48px));
+        margin: 0 auto;
+      }
+
+      .nav {
+        display: flex;
+        height: 74px;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid rgb(255 255 255 / 10%);
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: #fff;
+        font-size: 17px;
+        font-weight: 750;
+        letter-spacing: -0.045em;
+        text-decoration: none;
+      }
+
+      .brand-mark {
+        display: grid;
+        width: 30px;
+        height: 30px;
+        place-items: center;
+        border-radius: 10px;
+        background: linear-gradient(145deg, #62a1ff, #8148ee 58%, #d746a8);
+      }
+
+      .brand-mark::before {
+        width: 11px;
+        height: 11px;
+        border: 1.5px solid white;
+        border-radius: 4px;
+        content: "";
+      }
+
+      .back-link {
+        color: #c5cad6;
+        font-size: 12px;
+        text-decoration: none;
+      }
+
+      .hero {
+        padding: 48px 0 52px;
+      }
+
+      .eyebrow {
+        color: #9fbaff;
+        font-size: 10px;
+        font-weight: 750;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 14px 0 10px;
+        font-size: clamp(36px, 6vw, 58px);
+        letter-spacing: -0.07em;
+      }
+
+      .hero p {
+        max-width: 650px;
+        margin: 0;
+        color: #b6bac6;
+        font-size: 14px;
+        line-height: 1.7;
+      }
+
+      .draft-label {
+        display: inline-flex;
+        margin-top: 21px;
+        border: 1px solid rgb(255 255 255 / 17%);
+        border-radius: 999px;
+        padding: 8px 12px;
+        color: #e4e9f5;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .content {
+        display: grid;
+        grid-template-columns: 220px minmax(0, 1fr);
+        align-items: start;
+        gap: 42px;
+        padding-top: 42px;
+        padding-bottom: 76px;
+      }
+
+      .toc {
+        position: sticky;
+        top: 20px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px;
+        background: #fff;
+      }
+
+      .toc h2 {
+        margin: 0 0 13px;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .toc ol {
+        display: grid;
+        gap: 10px;
+        margin: 0;
+        padding-left: 18px;
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.45;
+      }
+
+      .toc a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .toc a:hover {
+        color: var(--blue);
+      }
+
+      .terms {
+        min-width: 0;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: clamp(24px, 5vw, 48px);
+        background: #fff;
+      }
+
+      .terms section + section {
+        margin-top: 35px;
+        border-top: 1px solid var(--line);
+        padding-top: 28px;
+      }
+
+      .terms h2 {
+        margin: 0 0 13px;
+        font-size: 20px;
+        letter-spacing: -0.045em;
+        line-height: 1.3;
+      }
+
+      .terms p,
+      .terms li {
+        color: #454c5a;
+        font-size: 13px;
+        line-height: 1.8;
+      }
+
+      .terms p {
+        margin: 10px 0;
+      }
+
+      .terms ul,
+      .terms ol {
+        display: grid;
+        gap: 7px;
+        padding-left: 22px;
+      }
+
+      .placeholder {
+        border-radius: 4px;
+        padding: 1px 4px;
+        background: #fff1ca;
+        color: #744f00;
+        overflow-wrap: anywhere;
+      }
+
+      .important {
+        border-left: 3px solid var(--blue);
+        padding: 13px 16px;
+        background: #f2f6ff;
+      }
+
+      .reviewer-notes {
+        margin-top: 48px;
+        border: 1px solid #e8c76d;
+        border-radius: 15px;
+        padding: 22px;
+        background: #fff9e8;
+      }
+
+      .reviewer-notes h2 {
+        color: #664a0b;
+      }
+
+      .reviewer-notes p,
+      .reviewer-notes li {
+        color: #66572f;
+      }
+
+      .footer {
+        color: #aeb3c0;
+        background: #11131b;
+      }
+
+      .footer-inner {
+        display: flex;
+        min-height: 74px;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        border-top: 1px solid rgb(255 255 255 / 10%);
+        font-size: 11px;
+      }
+
+      .footer a {
+        color: #d3d7e1;
+      }
+
+      @media (max-width: 780px) {
+        .content {
+          grid-template-columns: 1fr;
+          gap: 18px;
+        }
+
+        .toc {
+          position: static;
+        }
+
+        .toc ol {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 9px 18px;
+        }
+      }
+
+      @media (max-width: 520px) {
+        .nav,
+        .hero,
+        .content,
+        .footer-inner {
+          width: calc(100% - 32px);
+        }
+
+        .hero {
+          padding: 37px 0 40px;
+        }
+
+        .content {
+          padding-top: 24px;
+          padding-bottom: 48px;
+        }
+
+        .toc ol {
+          grid-template-columns: 1fr;
+        }
+
+        .terms {
+          border-radius: 15px;
+          padding: 22px 18px;
+        }
+
+        .footer-inner {
+          min-height: 88px;
+          flex-wrap: wrap;
+          padding: 18px 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="masthead">
+      <nav class="nav" aria-label="Main navigation">
+        <a class="brand" href="./landing.html">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span>codexgram</span>
+        </a>
+        <a class="back-link" href="./landing.html">Back to Codexgram</a>
+      </nav>
+      <div class="hero">
+        <span class="eyebrow">Andrew Studio · Student project beta</span>
+        <h1>Terms of Service</h1>
+        <p>These Terms cover access to and use of Codexgram, a limited, invitation-only beta for adults aged 18 and over.</p>
+        <span class="draft-label">Draft · Not for publication until reviewed</span>
+      </div>
+    </header>
+
+    <main class="content">
+      <nav class="toc" aria-label="Table of contents">
+        <h2>On this page</h2>
+        <ol>
+          <li><a href="#operator">Operator and service</a></li>
+          <li><a href="#acceptance">Agreement</a></li>
+          <li><a href="#eligibility">Eligibility and accounts</a></li>
+          <li><a href="#content">Your content</a></li>
+          <li><a href="#acceptable-use">Acceptable use</a></li>
+          <li><a href="#limits">Features and limits</a></li>
+          <li><a href="#third-parties">Third-party services</a></li>
+          <li><a href="#paid">Fees</a></li>
+          <li><a href="#ip">Our intellectual property</a></li>
+          <li><a href="#availability">Availability and beta</a></li>
+          <li><a href="#warranty">Disclaimers and liability</a></li>
+          <li><a href="#indemnity">Indemnity</a></li>
+          <li><a href="#termination">Suspension and termination</a></li>
+          <li><a href="#changes">Changes to these Terms</a></li>
+          <li><a href="#law">Governing law and disputes</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ol>
+      </nav>
+
+      <article class="terms">
+        <p><strong>Effective date:</strong> <span class="placeholder">[Effective Date]</span> · <strong>Last updated:</strong> <span class="placeholder">[Last Updated]</span></p>
+
+        <section id="operator">
+          <h2>1. Operator and service</h2>
+          <p>Codexgram is operated by Andrew Studio, a student project that is not a registered business, acting through <span class="placeholder">[Full legal name of the responsible individual]</span> (“Andrew Studio,” “we,” “us,” or “our”). Contact details are in Section 16.</p>
+          <p>Codexgram is a social app and website beta. It currently lets eligible members create profiles, search profiles, follow other members, publish photo or short-video posts with captions, view chronological feeds, like and comment on posts, share photo stories, view activity, and exchange one-to-one text messages.</p>
+        </section>
+
+        <section id="acceptance">
+          <h2>2. Agreement to these Terms</h2>
+          <p>By creating an account, accessing, or using Codexgram (the “Service”), you agree to these Terms. If you do not agree, do not access or use the Service.</p>
+          <p>These Terms do not replace any rights that cannot be waived under applicable law. Read our separate <a href="./privacy.html">Privacy Policy</a>.</p>
+        </section>
+
+        <section id="eligibility">
+          <h2>3. Eligibility and accounts</h2>
+          <p>The beta is limited to adults who are at least 18 years old and have been invited through the beta distribution process. By using the Service, you represent that you meet both requirements. The current app does not collect a date of birth or technically verify age or invitations; eligibility is a condition of these Terms, not an in-app age-verification feature.</p>
+          <p>Authentication is provided by Clerk. To use social features, you must also create a Codexgram profile. You are responsible for keeping your sign-in credentials secure, using the Service through your own account, and promptly contacting us if you believe your account has been accessed without authorization.</p>
+          <p>Profile usernames must be 3–30 characters and use letters, numbers, periods, or underscores. Display names must be 1–50 characters; bios may contain up to 160 characters. Usernames must be available and are normalized without regard to letter case.</p>
+        </section>
+
+        <section id="content">
+          <h2>4. Your content and how it is used</h2>
+          <p>“User Content” means material you submit through the Service, including profile details and photos, posts, captions, comments, stories, and messages. As between you and Andrew Studio, you retain rights you already hold in your User Content. You are responsible for it and for obtaining permissions needed to share it.</p>
+          <p>You grant Andrew Studio a limited, non-exclusive, royalty-free license to host, store, reproduce, transmit, technically process, and display your User Content only as needed to operate, secure, and provide the Service to you and its members. This includes allowing our infrastructure providers to process the content for those purposes. We do not receive a general advertising or promotional license under this clause.</p>
+          <p>The license applies while your content is available through the Service and for any limited period needed to complete deletion, resolve security or legal issues, or comply with law. Deletion and third-party retention are described in Section 14.</p>
+          <p>Profiles and posts can be viewed by signed-in members. Stories are returned in the active-story feed to members who follow the story author and stop appearing as active after 24 hours. Messages are available in the app to the members of that conversation. Messages are not end-to-end encrypted. Media links may be accessible to anyone who obtains the link, and other members may copy, capture, or share material they can view. Do not submit information you need to keep confidential.</p>
+        </section>
+
+        <section id="acceptable-use">
+          <h2>5. Acceptable use and moderation</h2>
+          <p>You must not use the Service to submit, share, or send content that is illegal, infringes another person’s rights, is hateful or harassing, or constitutes spam. You must not attempt to access accounts or conversations you are not authorized to use, interfere with the Service, or create a security risk.</p>
+          <p>You confirm that you have the rights and permissions necessary to submit your User Content and to grant the license in Section 4. You must not impersonate another person or misrepresent your authority to act for another person.</p>
+          <p>There is no in-app report feature in this beta. You may report content or conduct to <span class="placeholder">[contact@codexgram.app]</span>. Reports are handled manually. We may review, restrict, or remove content, or suspend or terminate access, where we reasonably consider it necessary for a breach of these Terms, legal compliance, or a security risk. We do not promise to monitor all content or act on every report.</p>
+        </section>
+
+        <section id="limits">
+          <h2>6. Current features and technical limits</h2>
+          <p>The following are current technical limits of the beta and may change as the Service develops:</p>
+          <ul>
+            <li>Each post contains one photo or one video. Photos may be up to 15 MB in JPEG, PNG, WebP, HEIC, or HEIF format. Videos may be up to 50 MB and 30 seconds in MP4 or QuickTime format.</li>
+            <li>Photo stories are image-only, may be up to 10 MB, and stop appearing in active-story results 24 hours after publication. This expiry does not itself delete the stored media file.</li>
+            <li>Captions may be up to 2,200 characters; comments up to 500 characters; text messages up to 4,000 characters.</li>
+            <li>Messages in the current app are text-only. New one-to-one conversations can be started only with a member you follow.</li>
+          </ul>
+          <p>The app does not currently offer direct deletion of an individual post. You can delete comments you authored and, where you own the post, comments on that post. Account deletion is described in Section 14.</p>
+        </section>
+
+        <section id="third-parties">
+          <h2>7. Third-party services</h2>
+          <p>The Service relies on Clerk for authentication and Convex for backend data and file storage. These providers operate services under their own agreements with Andrew Studio and may have separate privacy notices or terms applicable to their own services. We do not control their systems or availability. Their provider agreements do not replace these Terms between you and Andrew Studio.</p>
+          <p>Provider information: <a href="https://clerk.com/legal/privacy">Clerk Privacy Policy</a>. <span class="placeholder">[Add the applicable Convex privacy/terms link after confirming the deployed vendor agreement.]</span></p>
+        </section>
+
+        <section id="paid">
+          <h2>8. Fees</h2>
+          <p>The current beta is free. The Service does not currently offer paid plans, subscriptions, or in-app purchases, so no subscription cancellation or refund process currently applies. If we introduce a paid feature, we will disclose its price and applicable payment, renewal, cancellation, and refund terms before you purchase it.</p>
+        </section>
+
+        <section id="ip">
+          <h2>9. Our intellectual property</h2>
+          <p>Except for User Content and third-party materials, the Service—including its software, visual design, name, logos, and other materials—is owned by or licensed to <span class="placeholder">[Andrew Studio / confirmed intellectual-property owner]</span> and is protected by applicable intellectual-property laws. These Terms give you a limited, personal, non-transferable, revocable right to use the Service for its intended purpose during the beta. No other rights are granted.</p>
+        </section>
+
+        <section id="availability">
+          <h2>10. Beta availability and changes</h2>
+          <p>Codexgram is an experimental student-project beta. Features may change, be unavailable, or be discontinued, and we do not promise uninterrupted or error-free access. Do not rely on the Service as the only copy of your content or messages.</p>
+        </section>
+
+        <section id="warranty">
+          <h2>11. Disclaimers and limitation of liability</h2>
+          <p>To the maximum extent permitted by law, the Service is provided “AS IS” and “AS AVAILABLE,” without warranties beyond those that cannot lawfully be excluded. Nothing in these Terms limits mandatory consumer rights or liability that cannot legally be excluded or limited.</p>
+          <p>To the maximum extent permitted by law, Andrew Studio is not liable for indirect, incidental, special, punitive, or consequential loss, or loss of profits, data, goodwill, or business opportunity, arising out of or related to the Service.</p>
+          <p class="important">Subject to mandatory law, the aggregate monetary cap, if any, is <span class="placeholder">[Monetary Cap — determine with Polish counsel; do not insert 0 PLN without confirming enforceability]</span>. No cap or exclusion applies to liability that cannot legally be limited.</p>
+          <p>Nothing in this section excludes liability for intentional conduct or any other liability that applicable law requires to remain available.</p>
+        </section>
+
+        <section id="indemnity">
+          <h2>12. Your responsibility for claims</h2>
+          <p>To the extent permitted by law, you agree to indemnify and hold harmless Andrew Studio and the individual operating it against third-party claims, losses, and reasonable costs arising from your User Content or your material violation of these Terms. This does not apply to the extent a claim results from our own conduct for which liability cannot lawfully be excluded. We will give you reasonable notice of a claim and cooperate with you at your expense.</p>
+        </section>
+
+        <section id="termination">
+          <h2>13. Suspension and termination</h2>
+          <p>You may stop using the Service at any time. You may request account deletion through the Delete Account option in your profile. We may suspend or terminate access, or remove content, for the reasons described in Section 5, to comply with law, or if we discontinue the beta.</p>
+          <p>Suspension may make your profile and Service features unavailable. If your account is terminated, your right to use the Service ends. Sections that by their nature should continue—including intellectual-property, content-license periods, disclaimers, liability, indemnity, and dispute terms—continue to the extent applicable.</p>
+        </section>
+
+        <section id="deletion">
+          <h2>14. Account deletion and retention</h2>
+          <p>When you request account deletion in the app, the Service deletes your profile and associated Convex records, including your posts, comments, stories, follows, activities, and conversations involving your account, and requests deletion of your Clerk sign-in identity. Deleting a conversation also removes messages from the other participant in that conversation. This process involves separate systems and is not atomic. Deletion of stored files is best-effort, and the Clerk request may fail after your app records have been deleted. We therefore cannot promise immediate or permanent erasure of every copy.</p>
+          <p>Stories stop appearing as active in the app after 24 hours, but the current beta does not automatically delete their stored files at that time. A media URL already obtained may remain usable until the file is actually deleted.</p>
+          <p>Andrew Studio has not configured custom database backups for this beta. Convex and other providers may retain data under their own operational, backup, or legal-retention practices. Applicable retention period: <span class="placeholder">[Vendor Default Retention Period — verify before publication]</span>. If deletion fails or you need assistance, contact <span class="placeholder">[contact@codexgram.app]</span>.</p>
+        </section>
+
+        <section id="changes">
+          <h2>15. Changes to these Terms</h2>
+          <p>We may update these Terms to reflect changes to the Service or legal requirements. We will post the updated Terms at <span class="placeholder">[Terms URL]</span> and change the “Last updated” date. For material changes, we will provide reasonable notice by <span class="placeholder">[notice method, such as in-app notice or email]</span> where required by law. Your continued use after updated Terms take effect means you accept them only to the extent allowed by applicable law. If you do not agree, stop using the Service and request account deletion.</p>
+        </section>
+
+        <section id="law">
+          <h2>16. Governing law and disputes</h2>
+          <p>These Terms are governed by the laws of Poland. Disputes will be brought before the competent courts in Poland. This does not deprive a consumer of any mandatory right to bring a claim before another court or rely on another law where consumer-protection rules require it. There is no mandatory arbitration clause in these Terms.</p>
+        </section>
+
+        <section id="contact">
+          <h2>17. Contact</h2>
+          <p>Contact Andrew Studio about the Service, these Terms, account deletion, or content reports:</p>
+          <ul>
+            <li>Operator: Andrew Studio, an unregistered student project, operated by <span class="placeholder">[Full legal name of responsible individual]</span></li>
+            <li>Address: <span class="placeholder">[Address, including country]</span></li>
+            <li>Telephone: <span class="placeholder">[Telephone, if applicable]</span></li>
+            <li>Email: <span class="placeholder">[contact@codexgram.app]</span></li>
+          </ul>
+        </section>
+
+        <aside class="reviewer-notes" aria-labelledby="reviewer-title">
+          <h2 id="reviewer-title">Reviewer notes — remove this section before publication</h2>
+          <p>This draft reflects the user's stated policies but is not legal advice. A qualified Polish attorney should review it before publication, especially the consumer-rights, liability-cap, and indemnity language.</p>
+          <ul>
+            <li>Replace all highlighted placeholders: effective date, responsible individual's full legal name, address, contact details, privacy notice URL, terms URL, notice method, Convex retention period, IP owner, and any monetary cap.</li>
+            <li>The 18+ and invite-only policy is not technically enforced in the current app. Add an age/invitation check and an explicit Terms-acceptance step before beta access if those conditions are intended to be enforceable.</li>
+            <li>The repository contains no Privacy Notice or `/legal` app route. Publish a privacy notice and link it from the app and landing page before launch.</li>
+            <li>Deletion is not a guaranteed permanent wipe: file deletion errors are ignored so account deletion can proceed, and Clerk deletion is a separate request that can fail. Deleting an account also deletes entire conversations, including messages sent by the other participant. The terms above disclose this; implement reliable retries and verify vendor retention before promising more.</li>
+            <li>Stories are hidden from active results after 24 hours but their files are not automatically deleted; already-issued storage URLs may continue to work. Implement cleanup/access controls before promising that expired stories become inaccessible.</li>
+            <li>There is no in-app reporting or individual-post deletion flow. Reports are described as manual email reports; verify that the placeholder mailbox exists and is monitored.</li>
+            <li>The code has no payment or generative-AI feature. No paid-plan, refund, or AI-output terms were added.</li>
+            <li>Messages are stored as message-body records and are not end-to-end encrypted. Do not describe them as end-to-end encrypted or confidential.</li>
+            <li>The terms link is present on the standalone landing page, but the app currently has no Terms link or affirmative acceptance flow at sign-up. Confirm the acceptance and change-notice process is implemented before publication.</li>
+          </ul>
+        </aside>
+      </article>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <a href="./landing.html">Codexgram</a>
+        <span>Draft Terms · Andrew Studio student project beta</span>
+      </div>
+    </footer>
+  </body>
+</html>

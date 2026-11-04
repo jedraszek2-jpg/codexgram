@@ -1,3 +1,4 @@
+import { useAuth } from "@clerk/expo";
 import { useMutation, useQuery } from "convex/react";
 import { Image } from "expo-image";
 import { router } from "expo-router";
@@ -10,7 +11,8 @@ import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
 
 export default function NewMessageScreen() {
-  const following = useQuery(api.social.myFollowing, {});
+  const { isSignedIn } = useAuth({ treatPendingAsSignedOut: false });
+  const following = useQuery(api.social.myFollowing, isSignedIn ? {} : "skip");
   const getOrCreateConversation = useMutation(api.messages.getOrCreateConversation);
   const [openingUserId, setOpeningUserId] = useState<Id<"profiles"> | null>(null);
 

@@ -7,7 +7,10 @@ import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-nati
 export function ConvexProfileBootstrap({ children }: { children: ReactNode }) {
   const { isLoaded: clerkLoaded, isSignedIn, user } = useUser();
   const { isAuthenticated, isLoading: convexLoading } = useConvexAuth();
-  const profile = useQuery(api.social.myProfile, isAuthenticated ? {} : "skip");
+  const profile = useQuery(
+    api.social.myProfile,
+    isSignedIn && isAuthenticated ? {} : "skip",
+  );
   const ensureMyProfile = useMutation(api.social.ensureMyProfile);
   const [retry, setRetry] = useState(0);
   const [error, setError] = useState<string | null>(null);

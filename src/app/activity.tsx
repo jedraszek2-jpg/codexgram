@@ -1,3 +1,4 @@
+import { useAuth } from "@clerk/expo";
 import { useQuery } from "convex/react";
 import { Image } from "expo-image";
 import { router, Stack } from "expo-router";
@@ -23,7 +24,8 @@ type Activity = {
 };
 
 export default function ActivityScreen() {
-  const activities = useQuery(api.activities.getMyActivities, {});
+  const { isSignedIn } = useAuth({ treatPendingAsSignedOut: false });
+  const activities = useQuery(api.activities.getMyActivities, isSignedIn ? {} : "skip");
 
   return (
     <SafeAreaView style={styles.screen} edges={["top", "right", "left"]}>

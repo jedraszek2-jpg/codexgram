@@ -1,3 +1,4 @@
+import { useAuth } from "@clerk/expo";
 import { router } from "expo-router";
 import { Image } from "expo-image";
 import { SymbolView } from "expo-symbols";
@@ -47,11 +48,15 @@ const rowHeightRatios = [161 / 430, 173 / 430, 143 / 430, 158 / 430];
 
 export default function ExploreTab() {
   const { width } = useWindowDimensions();
+  const { isSignedIn } = useAuth({ treatPendingAsSignedOut: false });
   const scale = Math.min(width / 430, 1.2);
   const [activeCategory, setActiveCategory] = useState<Category>("For you");
   const [query, setQuery] = useState("");
-  const people = useQuery(api.social.searchProfiles, { search: query });
-  const feedPosts = useQuery(api.social.exploreFeed, {});
+  const people = useQuery(
+    api.social.searchProfiles,
+    isSignedIn ? { search: query } : "skip",
+  );
+  const feedPosts = useQuery(api.social.exploreFeed, isSignedIn ? {} : "skip");
   const toggleFollow = useMutation(api.social.toggleFollow);
   const [pendingProfiles, setPendingProfiles] = useState<Record<string, boolean>>({});
 

@@ -1,3 +1,4 @@
+import { useAuth } from "@clerk/expo";
 import { useMutation, useQuery } from "convex/react";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
@@ -28,11 +29,12 @@ function formatTime(timestamp: number) {
 export default function ChatScreen() {
   const { width } = useWindowDimensions();
   const scale = Math.min(width / 250, 1.5);
+  const { isSignedIn } = useAuth({ treatPendingAsSignedOut: false });
   const { conversationId: conversationIdParam } = useLocalSearchParams<{ conversationId: string }>();
   const conversationId = conversationIdParam as Id<"conversations">;
   const conversation = useQuery(
     api.messages.getMessages,
-    conversationIdParam ? { conversationId } : "skip",
+    isSignedIn && conversationIdParam ? { conversationId } : "skip",
   );
   const sendMessageMutation = useMutation(api.messages.sendMessage);
   const [draft, setDraft] = useState("");

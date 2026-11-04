@@ -1,3 +1,4 @@
+import { useAuth } from "@clerk/expo";
 import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
@@ -26,7 +27,11 @@ type Props = {
 
 export function CommentsSheet({ postId, visible, onClose }: Props) {
   const { t } = useTranslation();
-  const comments = useQuery(api.social.commentsForPost, postId ? { postId } : "skip");
+  const { isSignedIn } = useAuth({ treatPendingAsSignedOut: false });
+  const comments = useQuery(
+    api.social.commentsForPost,
+    isSignedIn && visible && postId ? { postId } : "skip",
+  );
   const addComment = useMutation(api.social.addComment);
   const removeComment = useMutation(api.social.removeComment);
   const [body, setBody] = useState("");

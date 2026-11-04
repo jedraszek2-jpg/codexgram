@@ -1,3 +1,4 @@
+import { useAuth } from "@clerk/expo";
 import { router, useLocalSearchParams } from "expo-router";
 import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
@@ -10,8 +11,12 @@ import { ProfileContent } from "../../components/ProfileContent";
 
 export default function UserProfileScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { isSignedIn } = useAuth({ treatPendingAsSignedOut: false });
   const profileId = id as Id<"profiles">;
-  const data = useQuery(api.social.profileById, id ? { profileId } : "skip");
+  const data = useQuery(
+    api.social.profileById,
+    isSignedIn && id ? { profileId } : "skip",
+  );
   const toggleFollow = useMutation(api.social.toggleFollow);
   const [followPending, setFollowPending] = useState(false);
 

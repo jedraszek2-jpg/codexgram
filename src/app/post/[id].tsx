@@ -1,3 +1,4 @@
+import { useAuth } from "@clerk/expo";
 import { router, useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
 import { SymbolView } from "expo-symbols";
@@ -22,10 +23,17 @@ import type { Id } from "../../../convex/_generated/dataModel";
 
 export default function PostDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { isSignedIn } = useAuth({ treatPendingAsSignedOut: false });
   const { width } = useWindowDimensions();
   const postId = id as Id<"posts"> | undefined;
-  const post = useQuery(api.social.postById, postId ? { postId } : "skip");
-  const comments = useQuery(api.social.commentsForPost, postId ? { postId } : "skip");
+  const post = useQuery(
+    api.social.postById,
+    isSignedIn && postId ? { postId } : "skip",
+  );
+  const comments = useQuery(
+    api.social.commentsForPost,
+    isSignedIn && postId ? { postId } : "skip",
+  );
   const toggleLike = useMutation(api.social.toggleLike);
   const addComment = useMutation(api.social.addComment);
   const removeComment = useMutation(api.social.removeComment);

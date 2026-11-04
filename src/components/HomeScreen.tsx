@@ -1,3 +1,4 @@
+import { useAuth } from "@clerk/expo";
 import { router } from "expo-router";
 import { Image } from "expo-image";
 import { SymbolView } from "expo-symbols";
@@ -45,10 +46,14 @@ type FeedPost = {
 
 export default function HomeScreen() {
   const { t } = useTranslation();
+  const { isSignedIn } = useAuth({ treatPendingAsSignedOut: false });
   const { width } = useWindowDimensions();
-  const feed = useQuery(api.social.homeFeed, {});
+  const feed = useQuery(api.social.homeFeed, isSignedIn ? {} : "skip");
   const [storiesNow, setStoriesNow] = useState(() => Date.now());
-  const activeStories = useQuery(api.stories.getActiveStories, { now: storiesNow });
+  const activeStories = useQuery(
+    api.stories.getActiveStories,
+    isSignedIn ? { now: storiesNow } : "skip",
+  );
   const toggleLike = useMutation(api.social.toggleLike);
   const [selectedPostId, setSelectedPostId] = useState<Id<"posts"> | null>(null);
   const [selectedStoryGroupIndex, setSelectedStoryGroupIndex] = useState<number | null>(null);
