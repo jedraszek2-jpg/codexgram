@@ -53,16 +53,19 @@ Aby wyświetlić te strony w formie graficznej (a nie jako kod źródłowy), wys
 ### 🗄️ Architektura Bazy Danych (Convex)
 Poniższy diagram przedstawia relacje między głównymi tabelami w bazie Convex:
 
+### 🗄️ Architektura Bazy Danych (Convex)
+Poniższy diagram przedstawia relacje między głównymi tabelami w bazie Convex:
+
 ```mermaid
 erDiagram
-    PROFILES ||--o{ POSTS : "tworzy"
-    PROFILES ||--o{ COMMENTS : "dodaje"
-    PROFILES ||--o{ LIKES : "daje"
-    PROFILES ||--o{ STORIES : "publikuje"
-    PROFILES ||--o{ CONVERSATIONS : "uczestniczy"
-    POSTS ||--o{ COMMENTS : "posiada"
-    POSTS ||--o{ LIKES : "otrzymuje"
-    CONVERSATIONS ||--o{ MESSAGES : "zawiera"
+    PROFILES ||--o{ POSTS : "creates"
+    PROFILES ||--o{ COMMENTS : "writes"
+    PROFILES ||--o{ LIKES : "gives"
+    PROFILES ||--o{ STORIES : "posts"
+    PROFILES ||--o{ CONVERSATIONS : "joins"
+    POSTS ||--o{ COMMENTS : "has"
+    POSTS ||--o{ LIKES : "receives"
+    CONVERSATIONS ||--o{ MESSAGES : "contains"
     
     PROFILES {
         string username
@@ -70,15 +73,16 @@ erDiagram
         string avatarStorageId
     }
     POSTS {
-        id authorId
-        id mediaId
+        string authorId
+        string mediaId
         string caption
     }
     MESSAGES {
-        id conversationId
-        id senderId
+        string conversationId
+        string senderId
         string text
     }
+```
 
     🚀 Uruchomienie lokalne
 
