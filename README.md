@@ -25,6 +25,16 @@ Aby przetestować aplikację z gotowymi danymi, zaloguj się za pomocą:
 *   **Lokalizacja (i18n):** Zmiana języka interfejsu (PL/EN) na podstawie lokalizacji w profilu.
 *   **Zarządzanie kontem:** Edycja profilu oraz pełne usuwanie konta z bazy (Convex + Clerk API).
 
+## 📱 Zrzuty ekranu (Screenshots)
+
+| Ekran powitalny | Ekran główny (Home) |
+| :---: | :---: |
+| ![Ekran powitalny](design/docs/main-screen.jpg) | ![Home](design/docs/home-screen.jpg) |
+
+| Explore | Edycja profilu |
+| :---: | :---: |
+| ![Explore](design/docs/explore.jpg) | ![Edycja profilu](design/docs/edit-profile.jpg) |
+
 ## 📄 Dokumenty prawne i Landing Page
 W ramach projektu przygotowałem również statyczne strony HTML z dokumentami prawnymi oraz stronę wizytówkę (Landing Page). Znajdują się one w folderze **`legal/`**:
 *   `landing.html` – strona wizytówka aplikacji (prezentacja projektu).
@@ -40,16 +50,52 @@ Aby wyświetlić te strony w formie graficznej (a nie jako kod źródłowy), wys
 *   **Autoryzacja:** Clerk (OAuth, JWT).
 *   **Język:** TypeScript.
 
-## 🚀 Uruchomienie lokalne
-1. Sklonuj repozytorium: `git clone https://github.com/jedraszek2-jpg/codexgram.git`
-2. Zainstaluj zależności: `npm install`
-3. Skopiuj plik `.env.example` do `.env.local` i uzupełnij wymagane klucze (Clerk Publishable Key, Convex URL, Clerk Secret Key).
-4. Uruchom backend Convexa: `npx convex dev`
-5. Uruchom aplikację w drugim terminalu: `npx expo start --dev-client`
+### 🗄️ Architektura Bazy Danych (Convex)
+Poniższy diagram przedstawia relacje między głównymi tabelami w bazie Convex:
 
-## 📦 Wdrożenie (CI/CD)
-Projekt wykorzystuje **EAS Build** (Expo Application Services) do budowania plików instalacyjnych w chmurze. Każdy nowy build dla Androida generowany jest komendą:
-`npx eas-cli@latest build --platform android --profile preview`
+```mermaid
+erDiagram
+    PROFILES ||--o{ POSTS : "tworzy"
+    PROFILES ||--o{ COMMENTS : "dodaje"
+    PROFILES ||--o{ LIKES : "daje"
+    PROFILES ||--o{ STORIES : "publikuje"
+    PROFILES ||--o{ CONVERSATIONS : "uczestniczy"
+    POSTS ||--o{ COMMENTS : "posiada"
+    POSTS ||--o{ LIKES : "otrzymuje"
+    CONVERSATIONS ||--o{ MESSAGES : "zawiera"
+    
+    PROFILES {
+        string username
+        string displayName
+        string avatarStorageId
+    }
+    POSTS {
+        id authorId
+        id mediaId
+        string caption
+    }
+    MESSAGES {
+        id conversationId
+        id senderId
+        string text
+    }
 
-## 🤖 Wykorzystanie AI
-Szczegółowy raport z wykorzystania narzędzi AI (Codex, GitHub Copilot) oraz opis wyzwań i procesu "Human-in-the-loop" znajduje się w pliku `AI_Usage.md`.
+    🚀 Uruchomienie lokalne
+
+    Sklonuj repozytorium: git clone https://github.com/jedraszek2-jpg/codexgram.git
+
+    Zainstaluj zależności: npm install
+
+    Skopiuj plik .env.example do .env.local i uzupełnij wymagane klucze (Clerk Publishable Key, Convex URL, Clerk Secret Key).
+
+    Uruchom backend Convexa: npx convex dev
+
+    Uruchom aplikację w drugim terminalu: npx expo start --dev-client
+
+📦 Wdrożenie (CI/CD)
+
+Projekt wykorzystuje EAS Build (Expo Application Services) do budowania plików instalacyjnych w chmurze. Każdy nowy build dla Androida generowany jest komendą:
+npx eas-cli@latest build --platform android --profile preview
+🤖 Wykorzystanie AI
+
+Szczegółowy raport z wykorzystania narzędzi AI (Codex, GitHub Copilot) oraz opis wyzwań i procesu "Human-in-the-loop" znajduje się w pliku AI_Usage.md.
