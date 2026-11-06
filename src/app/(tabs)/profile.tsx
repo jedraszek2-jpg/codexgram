@@ -1,4 +1,5 @@
 import { useAuth, useClerk } from "@clerk/expo";
+import { router } from "expo-router";
 import { api } from "../../../convex/_generated/api";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { SymbolView } from "expo-symbols";
@@ -102,7 +103,7 @@ export default function ProfileTab() {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={t("profile.home")}
-            onPress={() => Alert.alert("Codexgram", t("profile.viewingOwnProfile"))}
+            onPress={() => router.navigate("/(tabs)/home")}
             hitSlop={8}
             style={styles.topAction}
           >
@@ -112,15 +113,6 @@ export default function ProfileTab() {
             {data.profile.username}
           </Text>
           <View style={styles.topRightActions}>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={t("profile.camera")}
-              onPress={() => Alert.alert(t("profile.camera"), t("profile.cameraComingSoon"))}
-              hitSlop={8}
-              style={styles.topAction}
-            >
-              <SymbolView name={{ ios: "camera", android: "photo_camera", web: "photo_camera" }} tintColor="#1F1F1F" size={16 * scale} />
-            </Pressable>
             <Pressable
               accessibilityRole="button"
               accessibilityLabel={t("profile.options")}

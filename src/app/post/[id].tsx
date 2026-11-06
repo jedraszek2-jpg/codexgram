@@ -41,19 +41,6 @@ export default function PostDetailsScreen() {
   const [posting, setPosting] = useState(false);
   const [likePending, setLikePending] = useState(false);
 
-  const openAuthorProfile = () => {
-    if (post) router.push({ pathname: "/user/[id]", params: { id: post.author._id } });
-  };
-
-  const showPostOptions = () => {
-    if (!post) return;
-    Alert.alert("Opcje posta", undefined, [
-      { text: "Zobacz profil", onPress: openAuthorProfile },
-      { text: "Zobacz post", onPress: () => router.push({ pathname: "/post/[id]", params: { id: post._id } }) },
-      { text: "Anuluj", style: "cancel" },
-    ]);
-  };
-
   const handleLike = async () => {
     if (!post || likePending) return;
     setLikePending(true);
@@ -103,9 +90,7 @@ export default function PostDetailsScreen() {
           <SymbolView name={{ ios: "chevron.left", android: "arrow_back", web: "arrow_back" }} tintColor="#16191F" size={23} />
         </Pressable>
         <Text accessibilityRole="header" style={styles.screenTitle}>Post</Text>
-        <Pressable accessibilityRole="button" accessibilityLabel="More post options" onPress={showPostOptions} style={styles.topButton}>
-          <SymbolView name={{ ios: "ellipsis", android: "more_horiz", web: "more_horiz" }} tintColor="#16191F" size={23} />
-        </Pressable>
+        <View style={styles.topButton} />
       </View>
 
       {post === undefined ? (
@@ -119,16 +104,13 @@ export default function PostDetailsScreen() {
         <>
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
             <View style={styles.authorRow}>
-              <Pressable accessibilityRole="button" accessibilityLabel={"View " + post.author.displayName + "'s profile"} onPress={openAuthorProfile} style={styles.authorIdentity}>
+              <View style={styles.authorIdentity}>
                 <AuthorAvatar name={post.author.displayName} uri={post.author.avatarUrl} size={44} />
                 <View style={styles.authorCopy}>
                   <Text style={styles.authorName}>{post.author.displayName}</Text>
                   <Text style={styles.postDate}>{formatDate(post.createdAt)}</Text>
                 </View>
-              </Pressable>
-              <Pressable accessibilityRole="button" accessibilityLabel="More post options" hitSlop={8} onPress={showPostOptions} style={styles.moreButton}>
-                <SymbolView name={{ ios: "ellipsis", android: "more_horiz", web: "more_horiz" }} tintColor="#16191F" size={22} />
-              </Pressable>
+              </View>
             </View>
 
             {post.mediaType === "video" ? (
@@ -242,7 +224,6 @@ const styles = StyleSheet.create({
   authorCopy: { marginLeft: 12 },
   authorName: { color: "#151821", fontSize: 15, fontWeight: "700" },
   postDate: { marginTop: 2, color: "#7B8290", fontSize: 12 },
-  moreButton: { width: 34, height: 38, alignItems: "flex-end", justifyContent: "center" },
   avatarFallback: { alignItems: "center", justifyContent: "center", backgroundColor: "#E9F1FF" },
   avatarLetter: { color: "#3183F5", fontSize: 16, fontWeight: "700" },
   media: { alignSelf: "center", backgroundColor: "#F4F5F7", borderRadius: 14 },

@@ -1,14 +1,10 @@
 import { router } from "expo-router";
 import { Image } from "expo-image";
-import { SymbolView } from "expo-symbols";
 import { useMutation } from "convex/react";
-import { useState, type ComponentProps } from "react";
+import { useState } from "react";
 import { Alert, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
-
-type ProfileSection = "grid" | "videos" | "tagged";
-type ProfileSymbolName = ComponentProps<typeof SymbolView>["name"];
 
 export type ProfileContentProfile = {
   _id: Id<"profiles">;
@@ -30,12 +26,6 @@ export type ProfileContentPost = {
   caption: string | null;
 };
 
-const sections: { key: ProfileSection; label: string; icon: ProfileSymbolName }[] = [
-  { key: "grid", label: "Posts", icon: { ios: "square.grid.3x3", android: "grid_view", web: "grid_view" } },
-  { key: "videos", label: "Videos", icon: { ios: "play.rectangle", android: "video_library", web: "video_library" } },
-  { key: "tagged", label: "Tagged", icon: { ios: "person.crop.square", android: "account_box", web: "account_box" } },
-];
-
 export function ProfileContent({
   profile,
   posts,
@@ -48,19 +38,13 @@ export function ProfileContent({
   followPending?: boolean;
 }) {
   const { width } = useWindowDimensions();
-  const [selectedSection, setSelectedSection] = useState<ProfileSection>("grid");
   const [messagePending, setMessagePending] = useState(false);
   const getOrCreateConversation = useMutation(api.messages.getOrCreateConversation);
   const scale = Math.min(width / 250, 1.45);
   const avatarSize = 56 * scale;
   const imageGap = 2;
   const tileSize = (width - imageGap * 2) / 3;
-  const visiblePosts =
-    selectedSection === "grid"
-      ? posts.filter((post) => post.mediaType === "image")
-      : selectedSection === "videos"
-        ? posts.filter((post) => post.mediaType === "video")
-        : [];
+  const photoPosts = posts.filter((post) => post.mediaType === "image");
 
   return (
     <View>
@@ -159,40 +143,19 @@ export function ProfileContent({
         )}
       </View>
 
-      <View style={[styles.sectionBar, { height: 28 * scale }]}>
-        {sections.map((section) => {
-          const selected = selectedSection === section.key;
-          return (
-            <Pressable
-              key={section.key}
-              accessibilityRole="button"
-              accessibilityLabel={section.label}
-              accessibilityState={{ selected }}
-              onPress={() => setSelectedSection(section.key)}
-              style={styles.sectionButton}
-            >
-              <SymbolView
-                name={section.icon}
-                tintColor={selected ? "#1F1F1F" : "#687386"}
-                size={15 * scale}
-              />
-              {selected ? <View style={styles.sectionIndicator} /> : null}
-            </Pressable>
-          );
-        })}
-      </View>
-
-      {selectedSection === "tagged" ? (
-        <View style={styles.emptySection}><Text style={styles.emptyText}>No tagged photos yet</Text></View>
-      ) : visiblePosts.length === 0 ? (
+      {photoPosts.length === 0 ? (
         <View style={styles.emptySection}>
-          <Text style={styles.emptyText}>{selectedSection === "videos" ? "No videos yet" : "No posts yet"}</Text>
+          <Text style={styles.emptyText}>No posts yet</Text>
         </View>
       ) : (
         <View style={styles.gallery}>
-          {visiblePosts.map((post, index) => (
-            <View
+          {photoPosts.map((post, index) => (
+            <Pressable
               key={post._id}
+              accessibilityRole="button"
+              accessibilityLabel={post.caption || profile.displayName + " post"}
+              accessibilityHint="Opens post details"
+              onPress={() => router.push({ pathname: "/post/[id]", params: { id: post._id } })}
               style={{
                 width: tileSize,
                 height: tileSize,
@@ -200,19 +163,13 @@ export function ProfileContent({
                 marginBottom: imageGap,
               }}
             >
-              {post.mediaType === "image" ? (
-                <Image
-                  source={{ uri: post.mediaUrl }}
-                  style={styles.tileImage}
-                  contentFit="cover"
-                  accessibilityLabel={post.caption || profile.displayName + " post"}
-                />
-              ) : (
-                <View style={styles.videoTile}>
-                  <SymbolView name={{ ios: "play.fill", android: "play_arrow", web: "play_arrow" }} tintColor="#FFFFFF" size={24} />
-                </View>
-              )}
-            </View>
+              <Image
+                source={{ uri: post.mediaUrl }}
+                style={styles.tileImage}
+                contentFit="cover"
+                accessibilityLabel={post.caption || profile.displayName + " post"}
+              />
+            </Pressable>
           ))}
         </View>
       )}
@@ -240,12 +197,8 @@ const styles = StyleSheet.create({
   messageButton: { backgroundColor: "#287BFF" },
   messageButtonLabel: { color: "#FFFFFF", fontWeight: "600" },
   followPending: { opacity: 0.6 },
-  sectionBar: { flexDirection: "row", alignItems: "stretch", marginTop: 4 },
-  sectionButton: { flex: 1, alignItems: "center", justifyContent: "center" },
-  sectionIndicator: { position: "absolute", left: 0, right: 0, bottom: 0, height: 1, backgroundColor: "#111114" },
   gallery: { width: "100%", flexDirection: "row", flexWrap: "wrap", justifyContent: "flex-start" },
   tileImage: { width: "100%", height: "100%" },
-  videoTile: { flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#283244" },
   emptySection: { minHeight: 180, alignItems: "center", justifyContent: "center" },
   emptyText: { color: "#687386", fontSize: 13 },
 });

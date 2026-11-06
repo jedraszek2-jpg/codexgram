@@ -1,56 +1,55 @@
-# Welcome to your Expo app 👋
+# Codexgram 📸
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Nowoczesna aplikacja społecznościowa (mobile-first) zbudowana w oparciu o React Native (Expo) i Convex. Aplikacja umożliwia udostępnianie zdjęć, wchodzenie w interakcje, prowadzenie rozmów w czasie rzeczywistym oraz dodawanie relacji (Stories).
 
-## Get started
+## 🔗 Live Demo (Pobierz Aplikację)
+Aplikację można przetestować na urządzeniach z systemem Android. Pobierz plik instalacyjny (.apk) pod poniższym linkiem:
+👉 **[Pobierz Codexgram (APK)](https://drive.proton.me/urls/7YPNDXHJPW#m6G2DDoglZky)**
 
-1. Install dependencies
+**🎥 Wideo prezentujące działanie aplikacji:**
+👉 **[Zobacz wideo na YouTube](https://www.youtube.com/watch?v=Fg6Rc_Q6Fgc)**
 
-   ```bash
-   npm install
-   ```
+**🔑 Konto testowe:**
+Aby przetestować aplikację z gotowymi danymi, zaloguj się za pomocą:
+*   **E-mail:** `profesor.test@proton.me`
 
-2. Start the app
+*(Uwaga: Hasło do konta testowego oraz do skrzynki e-mail – wymaganej do odebrania kodu weryfikacyjnego – zostały przekazane prowadzącemu w prywatnej wiadomości / na zajęciach. Możesz też użyć przycisku "Continue with Google" i założyć własne konto).*
 
-   ```bash
-   npx expo start
-   ```
+## ✨ Główne funkcjonalności
+*   **Uwierzytelnianie:** Logowanie przez Google OAuth oraz e-mail/hasło (Clerk).
+*   **Onboarding:** Wybór unikalnego username, nazwy wyświetlanej i avatara.
+*   **Feed (Home):** Chronologiczny widok postów obserwowanych osób.
+*   **Interakcje:** Polubienia, komentarze, system obserwowania (Follow).
+*   **Wiadomości:** Czat 1:1 w czasie rzeczywistym (real-time).
+*   **Stories:** Dodawanie zdjęć, które wygasają po 24 godzinach.
+*   **Lokalizacja (i18n):** Zmiana języka interfejsu (PL/EN) na podstawie lokalizacji w profilu.
+*   **Zarządzanie kontem:** Edycja profilu oraz pełne usuwanie konta z bazy (Convex + Clerk API).
 
-In the output, you'll find options to open the app in a
+## 📄 Dokumenty prawne i Landing Page
+W ramach projektu przygotowałem również statyczne strony HTML z dokumentami prawnymi oraz stronę wizytówkę (Landing Page). Znajdują się one w folderze **`legal/`**:
+*   `landing.html` – strona wizytówka aplikacji (prezentacja projektu).
+*   `privacy.html` – Polityka Prywatności.
+*   `terms.html` – Regulamin (Terms of Service).
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+**Jak je zobaczyć?**
+Aby wyświetlić te strony w formie graficznej (a nie jako kod źródłowy), wystarczy pobrać repozytorium lub otworzyć pliki lokalnie i kliknąć w nie dwukrotnie (otworzą się w domyślnej przeglądarce). Można je również uruchomić za pomocą rozszerzenia "Live Server" w VS Code.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## 🛠 Stack Technologiczny
+*   **Frontend:** React Native, Expo SDK 57, Expo Router, NativeWind (Tailwind CSS).
+*   **Backend & Baza Danych:** Convex (Cloud Functions, Database, File Storage).
+*   **Autoryzacja:** Clerk (OAuth, JWT).
+*   **Język:** TypeScript.
 
-## Get a fresh project
+## 🚀 Uruchomienie lokalne
+1. Sklonuj repozytorium: `git clone https://github.com/jedraszek2-jpg/codexgram.git`
+2. Zainstaluj zależności: `npm install`
+3. Skopiuj plik `.env.example` do `.env.local` i uzupełnij wymagane klucze (Clerk Publishable Key, Convex URL, Clerk Secret Key).
+4. Uruchom backend Convexa: `npx convex dev`
+5. Uruchom aplikację w drugim terminalu: `npx expo start --dev-client`
 
-When you're ready, run:
+## 📦 Wdrożenie (CI/CD)
+Projekt wykorzystuje **EAS Build** (Expo Application Services) do budowania plików instalacyjnych w chmurze. Każdy nowy build dla Androida generowany jest komendą:
+`npx eas-cli@latest build --platform android --profile preview`
 
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-### Other setup steps
-
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## 🤖 Wykorzystanie AI
+Szczegółowy raport z wykorzystania narzędzi AI (Codex, GitHub Copilot) oraz opis wyzwań i procesu "Human-in-the-loop" znajduje się w pliku `AI_Usage.md`.
