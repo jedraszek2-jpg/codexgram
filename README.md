@@ -50,6 +50,20 @@ Aby wyświetlić te strony w formie graficznej (a nie jako kod źródłowy), wys
 *   **Autoryzacja:** Clerk (OAuth, JWT).
 *   **Język:** TypeScript.
 
+## 📡 Dokumentacja API (Convex Functions)
+Zamiast tradycyjnych endpointów REST, aplikacja wykorzystuje funkcje serverless w Convex. Oto najważniejsze z nich:
+
+*   **Queries (Odczyt danych):**
+    *   `api.social.myProfile` – pobiera profil zalogowanego użytkownika.
+    *   `api.social.homeFeed` – pobiera posty obserwowanych użytkowników.
+    *   `api.messages.getMyConversations` – pobiera listę czatów.
+    *   `api.stories.getActiveStories` – pobiera aktywne historie (młodsze niż 24h).
+*   **Mutations (Zapis danych):**
+    *   `api.social.createPost` – dodaje nowy post.
+    *   `api.social.toggleLike` – dodaje/usuwa polubienie.
+    *   `api.messages.sendMessage` – wysyła wiadomość na czacie.
+    *   `api.users.deleteMyAccount` – usuwa konto i wszystkie dane (Convex + Clerk).
+
 ### 🗄️ Architektura Bazy Danych (Convex)
 Poniższy diagram przedstawia relacje między głównymi tabelami w bazie Convex:
 
@@ -103,3 +117,4 @@ npx eas-cli@latest build --platform android --profile preview
 🤖 Wykorzystanie AI
 
 Szczegółowy raport z wykorzystania narzędzi AI (Codex, GitHub Copilot) oraz opis wyzwań i procesu "Human-in-the-loop" znajduje się w pliku AI_Usage.md.
+
