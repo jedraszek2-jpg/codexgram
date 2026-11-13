@@ -4,7 +4,43 @@ Nowoczesna aplikacja społecznościowa (mobile-first) zbudowana w oparciu o Reac
 
 ## 🔗 Live Demo (Pobierz Aplikację)
 Aplikację można przetestować na urządzeniach z systemem Android. Pobierz plik instalacyjny (.apk) pod poniższym linkiem:
-👉 **[Pobierz Codexgram (APK)](https://drive.proton.me/urls/7YPNDXHJPW#m6G2DDoglZky)**
+👉 **[Pobierz Codexgram (APK)](https://drive.proton.me/urls/YJQ7HFT88M#yLpzGzcGVrab)**
+
+## 🛠️ Instrukcja uruchomienia (Wersja Deweloperska)
+
+Pobrany plik `.apk` to tzw. **Development Build**. Oznacza to, że aplikacja na telefonie jest jedynie "skorupą", która do działania wymaga połączenia z serwerem uruchomionym na komputerze. Aby przetestować aplikację, wykonaj poniższe kroki:
+
+### Wymagania wstępne:
+*   Zainstalowany **Node.js** na komputerze.
+*   Telefon z Androidem i komputer podłączone do **tej samej sieci Wi-Fi**.
+*   Zainstalowana aplikacja **Codexgram** na telefonie (z pobranego pliku APK).
+
+### Krok 1: Pobranie i konfiguracja projektu
+1. Sklonuj repozytorium na komputer: `git clone https://github.com/jedraszek2-jpg/codexgram.git`
+2. Przejdź do folderu projektu: `cd codexgram`
+3. Zainstaluj zależności: `npm install`
+4. Skopiuj plik `.env.example` i zmień jego nazwę na `.env.local`.
+5. **Bardzo ważne:** W pliku `.env.local` uzupełnij klucze środowiskowe (Clerk Publishable Key, Convex URL). *Ze względów bezpieczeństwa klucze te zostały przekazane prowadzącemu w prywatnej wiadomości.*
+
+### Krok 2: Uruchomienie serwerów (wymagane dwa terminale)
+Otwórz terminal w folderze projektu.
+
+**Terminal 1 (Backend):**
+```bash
+npx convex dev
+
+**Terminal 2 (Frontend):**
+npx expo start --dev-client
+
+Krok 3: Połączenie telefonu z komputerem
+
+    Otwórz zainstalowaną aplikację Codexgram na telefonie.
+
+    W terminalu z Expo pojawi się kod QR. Zeskanuj go za pomocą aplikacji Codexgram (jeśli aplikacja nie ma wbudowanego skanera, możesz wpisać ręcznie adres IP wyświetlony w terminalu, np. exp://192.168.1.xxx:8081).
+
+    Po chwili aplikacja załaduje się i będziesz mógł się zalogować.
+
+(Jeśli aplikacja nie chce się połączyć, upewnij się, że komputer i telefon są w tej samej sieci, a zapora Windows nie blokuje połączenia z Node.js).
 
 **🎥 Wideo prezentujące działanie aplikacji:**
 👉 **[Zobacz wideo na YouTube](https://www.youtube.com/watch?v=Fg6Rc_Q6Fgc)**
